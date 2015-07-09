@@ -36,8 +36,6 @@ function process(file)
 			continue;
 		}
 
-		// TODO: access
-
 		// Only handle global, instance, static
 		if (data[i].scope === "inner") {
 			continue;
@@ -112,8 +110,9 @@ function docReturn(returns) {
 }
 
 function docAccessLevel(access) {
-	// TODO: Check what is valid for func, prop, class
-	if (!access) {
+	// Everything is public by default and @public tags
+	// generate warnings, therefore leave them out.
+	if (!access || access === "public") {
 		return "";
 	}
 	return docLine("@" + access);
