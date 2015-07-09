@@ -89,7 +89,10 @@ function docParams(params) {
 
 	var doc = "";
 	for (var i = 0; i < params.length; i++) {
-		doc += docLine("@param " + generateType(params[i].type) + params[i].name);
+		var type = generateType(params[i].type);
+		var name = params[i].name ? params[i].name : "";
+		var description = params[i].description ? params[i].description : "";
+		doc += docLine("@param " + type + name + description);
 	}
 	return doc;
 }
