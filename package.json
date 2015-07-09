@@ -1,0 +1,18 @@
+{
+	"author": "Max Geissler",
+	"name": "jsdoc2jsduck",
+	"description": "jsdoc2jsduck description.",
+	"homepage": "https://github.com/fluidblue/jsdoc2jsduck",
+	"version": "0.1.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/fluidblue/jsdoc2jsduck"
+	},
+	"bin": "./jsdoc2jsduck.js",
+	"dependencies":
+	{
+		"optimist": "0.6.x",
+		"fs": "*",
+		"path": "*"
+    }
+}
