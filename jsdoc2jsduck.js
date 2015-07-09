@@ -108,6 +108,8 @@ function processMethod(item) {
 
 	doc += docLine('@method ' + item.name);
 	doc += docLine(item.description ? item.description : "");
+	// TODO: Add params
+	// TODO: Add return
 
 	return docEnd(doc);
 }
