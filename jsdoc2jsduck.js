@@ -94,6 +94,20 @@ function docParams(params) {
 	return doc;
 }
 
+function docReturn(returns) {
+	if (!returns) {
+		return "";
+	}
+	for (var i = 0; i < returns.length; i++) {
+		var type = generateType(returns[i].type);
+		var description = returns[i].description ? returns[i].description : "";
+		if (type.length + description.length <= 0) {
+			return "";
+		}
+	}
+	return docLine("@return " + type + description);
+}
+
 function processMember(item) {
 	var doc = docBegin();
 
@@ -109,7 +123,7 @@ function processMethod(item) {
 	doc += docLine('@method ' + item.name);
 	doc += docLine(item.description ? item.description : "");
 	// TODO: Add params
-	// TODO: Add return
+	doc += docReturn(item.returns);
 
 	return docEnd(doc);
 }
