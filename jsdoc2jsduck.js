@@ -111,10 +111,19 @@ function docReturn(returns) {
 	return docLine("@return " + type + description);
 }
 
+function docAccessLevel(access) {
+	// TODO: Check what is valid for func, prop, class
+	if (!access) {
+		return "";
+	}
+	return docLine("@" + access);
+}
+
 function processMember(item) {
 	var doc = docBegin();
 
 	doc += docLine('@property ' + generateType(item.type) + item.name);
+	doc += docAccessLevel(item.access);
 	doc += docLine(item.description ? item.description : "");
 
 	return docEnd(doc);
@@ -124,6 +133,7 @@ function processMethod(item) {
 	var doc = docBegin();
 
 	doc += docLine('@method ' + item.name);
+	doc += docAccessLevel(item.access);
 	doc += docLine(item.description ? item.description : "");
 	doc += docParams(item.params);
 	doc += docReturn(item.returns);
@@ -140,6 +150,7 @@ function processClass(item) {
 			doc += docLine('@extends ' + item.augments[i]);
 		}
 	}
+	doc += docAccessLevel(item.access);
 	doc += docLine(item.description);
 	doc += docLine("@constructor");
 	doc += docParams(item.params);
