@@ -90,8 +90,8 @@ function docParams(params) {
 	var doc = "";
 	for (var i = 0; i < params.length; i++) {
 		var type = generateType(params[i].type);
-		var name = params[i].name ? params[i].name : "";
-		var description = params[i].description ? params[i].description : "";
+		var name = params[i].name ? " " + params[i].name : "";
+		var description = params[i].description ? " " + params[i].description : "";
 		doc += docLine("@param " + type + name + description);
 	}
 	return doc;
@@ -103,7 +103,7 @@ function docReturn(returns) {
 	}
 	for (var i = 0; i < returns.length; i++) {
 		var type = generateType(returns[i].type);
-		var description = returns[i].description ? returns[i].description : "";
+		var description = returns[i].description ? " " + returns[i].description : "";
 		if (type.length + description.length <= 0) {
 			return "";
 		}
