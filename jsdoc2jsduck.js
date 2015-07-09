@@ -19,17 +19,104 @@ var fs = require('fs');
 var path = require('path');
 var optimist = require('optimist');
 
-outDir = "./out";
+outDir = "";
 
 function process(file)
 {
 	rawData = fs.readFileSync(file, 'utf8');
 	data = JSON.parse(rawData);
 
+
+	var fileContent = ""
 	for (var i = 0; i < data.length; i++)
 	{
-		console.log(data);
+		// TODO: Remove
+		if (data[i].longname.lastIndexOf("ts.activity.ActivityViewBase", 0) !== 0) {
+			continue;
+		}
+
+		//console.log(data[i]);
+
+		switch (data[i].kind) {
+			case "class":
+				fileContent += processClass(data[i]);
+				break;
+			case "function":
+				fileContent += processMethod(data[i]);
+				break;
+			case "member":
+				fileContent += processMember(data[i]);
+				break;
+		}
 	}
+
+	saveFile(outDir + '/out.js', fileContent);
+}
+
+function processMember(item) {
+	var doc = docBegin();
+
+	doc = docAddLine(doc, '@property ' + generateType(item.type) + item.name);
+	doc = docAddLine(doc, item.description ? item.description : "");
+
+	return docEnd(doc);
+}
+
+function processMethod(item) {
+	var doc = docBegin();
+
+	doc = docAddLine(doc, '@method ' + item.name);
+	doc = docAddLine(doc, item.description ? item.description : "");
+
+	return docEnd(doc);
+}
+
+function processClass(item) {
+	var doc = docBegin();
+
+	doc = docAddLine(doc, '@class ' + item.longname);
+	if (item.augments) {
+		for (var i = 0; i < item.augments.length; i++) {
+			doc = docAddLine(doc, '@extends ' + item.augments[i]);
+		}
+	}
+	doc = docAddLine(doc, item.description);
+	docAddParams(doc, item);
+
+	return docEnd(doc);
+}
+
+function docAddParams(doc, item) {
+	// TODO
+	return doc;
+}
+
+function generateType(type) {
+	var docType = ""
+	for (var i = 0; i < type.names.length; i++) {
+		if (docType.length > 0)
+		{
+			docType += "|";
+		}
+		docType += type.names[i];
+
+	}
+	if (docType.length > 0) {
+		docType = "{" + docType + "} ";
+	}
+	return docType;
+}
+
+function docBegin() {
+	return '/**';
+}
+
+function docAddLine(doc, line) {
+	return doc + '\n * ' + line
+}
+
+function docEnd(doc) {
+	return doc + '\n */\n';
 }
 
 function saveFile(file, data)
@@ -65,9 +152,7 @@ function main()
 	var argv = getArgv();
 
 	var inFile = argv.in;
-
-	if (argv.out !== '')
-		outDir = argv.out;
+	outDir = argv.out;
 
 	console.log('Input file: ' + inFile + '\nOutput dir: ' + outDir);
 
