@@ -125,7 +125,7 @@ function processMethod(item) {
 
 	doc += docLine('@method ' + item.name);
 	doc += docLine(item.description ? item.description : "");
-	// TODO: Add params
+	doc += docParams(item.params);
 	doc += docReturn(item.returns);
 
 	return docEnd(doc);
