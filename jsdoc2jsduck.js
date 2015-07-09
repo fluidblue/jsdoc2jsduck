@@ -31,11 +31,17 @@ function process(file)
 	for (var i = 0; i < data.length; i++)
 	{
 		// TODO: Remove
-		if (data[i].longname.lastIndexOf("ts.activity.ActivityViewBase", 0) !== 0) {
+		if (!(data[i].longname.lastIndexOf("ts.activity.ActivityFilterBase", 0) === 0 ||
+			data[i].longname.lastIndexOf("ts.activity.ActivityViewBase", 0) === 0)) {
 			continue;
 		}
 
-		//console.log(data[i]);
+		// TODO: access
+
+		// Only handle global, instance, static
+		if (data[i].scope === "inner") {
+			continue;
+		}
 
 		switch (data[i].kind) {
 			case "class":
@@ -47,51 +53,20 @@ function process(file)
 			case "member":
 				fileContent += processMember(data[i]);
 				break;
+			default:
+				console.log("Not yet supported: " + data[i].kind);
+				break;
 		}
 	}
 
 	saveFile(outDir + '/out.js', fileContent);
 }
 
-function processMember(item) {
-	var doc = docBegin();
-
-	doc = docAddLine(doc, '@property ' + generateType(item.type) + item.name);
-	doc = docAddLine(doc, item.description ? item.description : "");
-
-	return docEnd(doc);
-}
-
-function processMethod(item) {
-	var doc = docBegin();
-
-	doc = docAddLine(doc, '@method ' + item.name);
-	doc = docAddLine(doc, item.description ? item.description : "");
-
-	return docEnd(doc);
-}
-
-function processClass(item) {
-	var doc = docBegin();
-
-	doc = docAddLine(doc, '@class ' + item.longname);
-	if (item.augments) {
-		for (var i = 0; i < item.augments.length; i++) {
-			doc = docAddLine(doc, '@extends ' + item.augments[i]);
-		}
-	}
-	doc = docAddLine(doc, item.description);
-	docAddParams(doc, item);
-
-	return docEnd(doc);
-}
-
-function docAddParams(doc, item) {
-	// TODO
-	return doc;
-}
-
 function generateType(type) {
+	if (!type || !type.names) {
+		return "";
+	}
+
 	var docType = ""
 	for (var i = 0; i < type.names.length; i++) {
 		if (docType.length > 0)
@@ -107,12 +82,58 @@ function generateType(type) {
 	return docType;
 }
 
+function docParams(params) {
+	if (!params) {
+		return "";
+	}
+
+	var doc = "";
+	for (var i = 0; i < params.length; i++) {
+		doc += docLine("@param " + generateType(params[i].type) + params[i].name);
+	}
+	return doc;
+}
+
+function processMember(item) {
+	var doc = docBegin();
+
+	doc += docLine('@property ' + generateType(item.type) + item.name);
+	doc += docLine(item.description ? item.description : "");
+
+	return docEnd(doc);
+}
+
+function processMethod(item) {
+	var doc = docBegin();
+
+	doc += docLine('@method ' + item.name);
+	doc += docLine(item.description ? item.description : "");
+
+	return docEnd(doc);
+}
+
+function processClass(item) {
+	var doc = docBegin();
+
+	doc += docLine('@class ' + item.longname);
+	if (item.augments) {
+		for (var i = 0; i < item.augments.length; i++) {
+			doc += docLine('@extends ' + item.augments[i]);
+		}
+	}
+	doc += docLine(item.description);
+	doc += docLine("@constructor");
+	doc += docParams(item.params);
+
+	return docEnd(doc);
+}
+
 function docBegin() {
 	return '/**';
 }
 
-function docAddLine(doc, line) {
-	return doc + '\n * ' + line
+function docLine(line) {
+	return '\n * ' + line
 }
 
 function docEnd(doc) {
