@@ -41,6 +41,18 @@ function process(file)
 			continue;
 		}
 
+		// TODO: Add author
+		// TODO: Add borrowed / extends / inherited / inherits
+		// TODO: Add copyright
+		// TODO: Add defaultvalue (and defaultvaluetype)
+		// TODO: Add deprecated
+		// TODO: Add exceptions
+		// TODO: Add (member): optional
+		// TODO: Add (member): overrides
+		// TODO: Add (member): readonly
+		// TODO: Add (member): virtual
+
+		// TODO: Handle constant, param
 		switch (data[i].kind) {
 			case "class":
 				fileContent += processClass(data[i]);
