@@ -21,11 +21,17 @@ var optimist = require('optimist');
 
 outDir = "";
 
+function DocTree(jsdoc, children) {
+	this.jsdoc = jsdoc;
+	this.children = children;
+}
+
 function process(file)
 {
 	rawData = fs.readFileSync(file, 'utf8');
 	data = JSON.parse(rawData);
 
+	var docTree = new DocTree(null, null);
 
 	var fileContent = ""
 	for (var i = 0; i < data.length; i++)
@@ -40,6 +46,19 @@ function process(file)
 		if (data[i].scope === "inner") {
 			continue;
 		}
+
+		// TODO: Build DocTree
+		path = [];
+		qualifiers = data[i].longname.split('~')[0].split('#');
+		if (qualifiers.length > 1) {
+			path = qualifiers[0].split('.').concat(qualifiers[1]);
+		} else {
+			path = qualifiers[0].split('.');
+		}
+		console.log(data[i].longname + ": " + path.toString());
+
+		// TODO: Remove
+		continue;
 
 		// TODO: Add author
 		// TODO: Add borrowed / extends / inherited / inherits
