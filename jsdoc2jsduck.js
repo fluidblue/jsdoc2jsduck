@@ -103,40 +103,15 @@ function processJSDoc(jsdoc) {
 	}
 }
 
-// function processDocTree(docTree) {
-// 	var currentNode = docTree;
-// 	var output = "";
-// 	for (var qualifier in currentNode.children) {
-// 		if (currentNode.children.hasOwnProperty(qualifier)) {
-// 			// TODO
-// 		}
-// 	}
-// }
-
-function isContainer(longname) {
-	return !(jsdoc.longname.includes("#") || jsdoc.longname.includes("~"));
-}
-
-function processDocTree(docTree, jsdoc) {
-	if (!isContainer(jsdoc.longname)) {
-		// Only process containers
-		return "";
+function processDocTree(docTree) {
+	var output = "";
+	if (docTree.jsdoc !== null) {
+		output += processJSDoc(docTree.jsdoc);
 	}
-
-	var path = getPath(jsdoc.longname);
-	var output = processJSDoc(jsdoc);
-
-	var currentNode = docTree;
-	for (var i = 0; i < path.length; i++) {
-		currentNode = currentNode.children[path[i]];
-	}
-	if (currentNode.children !== null) {
-		for (var qualifier in currentNode.children) {
-			if (currentNode.children.hasOwnProperty(qualifier)) {
-				output += processJSDoc(currentNode.children[qualifier]);
-				if (isContainer(currentNode.children[qualifier])) {
-					// TODO: Recursive
-				}
+	if (docTree.children !== null) {
+		for (var qualifier in docTree.children) {
+			if (docTree.children.hasOwnProperty(qualifier)) {
+				output += processDocTree(docTree.children[qualifier]);
 			}
 		}
 	}
@@ -154,12 +129,7 @@ function processFile(inFile, outDir)
 		addItemToDocTree(docTree, data[i]);
 	}
 
-	var fileContent = "";
-	for (var i = 0; i < data.length; i++)
-	{
-		fileContent += processDocTree(docTree, data[i]);
-	}
-
+	var fileContent = processDocTree(docTree);
 	saveFile(outDir + '/out.js', fileContent);
 }
 
