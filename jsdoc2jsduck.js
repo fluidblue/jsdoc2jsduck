@@ -116,7 +116,8 @@ function processJSDoc(jsdoc) {
 			// Ignore, because JSDuck builds package list automatically.
 			return "";
 		default:
-			console.log("Not yet supported: " + jsdoc.kind);
+			console.log("Unsupported documentation type (" + jsdoc.kind + ") in file "
+				+ jsdoc.meta.path + "/" + jsdoc.meta.filename + ":" + jsdoc.meta.lineno);
 			return "";
 	}
 }
