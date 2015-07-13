@@ -103,14 +103,44 @@ function processJSDoc(jsdoc) {
 	}
 }
 
-function processDocTree(docTree) {
+// function processDocTree(docTree) {
+// 	var currentNode = docTree;
+// 	var output = "";
+// 	for (var qualifier in currentNode.children) {
+// 		if (currentNode.children.hasOwnProperty(qualifier)) {
+// 			// TODO
+// 		}
+// 	}
+// }
+
+function isContainer(longname) {
+	return !(jsdoc.longname.includes("#") || jsdoc.longname.includes("~"));
+}
+
+function processDocTree(docTree, jsdoc) {
+	if (!isContainer(jsdoc.longname)) {
+		// Only process containers
+		return "";
+	}
+
+	var path = getPath(jsdoc.longname);
+	var output = processJSDoc(jsdoc);
+
 	var currentNode = docTree;
-	var output = "";
-	for (var qualifier in currentNode.children) {
-		if (currentNode.children.hasOwnProperty(qualifier)) {
-			// TODO
+	for (var i = 0; i < path.length; i++) {
+		currentNode = currentNode.children[path[i]];
+	}
+	if (currentNode.children !== null) {
+		for (var qualifier in currentNode.children) {
+			if (currentNode.children.hasOwnProperty(qualifier)) {
+				output += processJSDoc(currentNode.children[qualifier]);
+				if (isContainer(currentNode.children[qualifier])) {
+					// TODO: Recursive
+				}
+			}
 		}
 	}
+	return output;
 }
 
 function processFile(inFile, outDir)
@@ -124,7 +154,12 @@ function processFile(inFile, outDir)
 		addItemToDocTree(docTree, data[i]);
 	}
 
-	var fileContent = processDocTree(docTree);
+	var fileContent = "";
+	for (var i = 0; i < data.length; i++)
+	{
+		fileContent += processDocTree(docTree, data[i]);
+	}
+
 	saveFile(outDir + '/out.js', fileContent);
 }
 
