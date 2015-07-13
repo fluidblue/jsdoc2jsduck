@@ -110,9 +110,8 @@ function processJSDoc(jsdoc) {
 		case "function":
 			return processMethod(jsdoc);
 		case "member":
-			return processMember(jsdoc);
 		case "constant":
-			return processConstant(jsdoc);
+			return processMember(jsdoc);
 		default:
 			console.log("Not yet supported: " + jsdoc.kind);
 			return "";
@@ -221,16 +220,9 @@ function processMember(item) {
 
 	doc += docLine('@property ' + generateType(item.type) + item.name);
 	doc += docAccessLevel(item.access);
-	doc += docLine(item.description ? item.description : "");
-
-	return docEnd(doc);
-}
-
-function processConstant(item) {
-	var doc = docBegin();
-
-	doc += docLine('@readonly ' + generateType(item.type) + item.name);
-	doc += docAccessLevel(item.access);
+	if (item.kind === "constant") {
+		doc += docLine('@readonly');
+	}
 	doc += docLine(item.description ? item.description : "");
 
 	return docEnd(doc);
