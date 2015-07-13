@@ -19,74 +19,114 @@ var fs = require('fs');
 var path = require('path');
 var optimist = require('optimist');
 
-outDir = "";
+debugger;
 
 function DocTree(jsdoc, children) {
 	this.jsdoc = jsdoc;
 	this.children = children;
 }
 
-function process(file)
-{
-	rawData = fs.readFileSync(file, 'utf8');
-	data = JSON.parse(rawData);
+var docTree = new DocTree(null, null);
 
-	var docTree = new DocTree(null, null);
+function getPath(longname) {
+	path = [];
+	qualifiers = longname.split('~')[0].split('#');
+	if (qualifiers.length > 1) {
+		path = qualifiers[0].split('.').concat(qualifiers[1]);
+	} else {
+		path = qualifiers[0].split('.');
+	}
+	return path;
+}
+
+function processPath(currentNode, path, jsdoc) {
+	if (path.length === 0) {
+		if (currentNode.jsdoc !== null) {
+			console.log("Warning: Multiple jsdoc entries for " + jsdoc.longname);
+		}
+		// Add jsdoc to tree
+		currentNode.jsdoc = jsdoc;
+
+		return;
+	}
+
+	var qualifier = path.shift();
+
+	if (currentNode.children === null) {
+		currentNode.children = {};
+	}
+	if (!currentNode.children.hasOwnProperty(qualifier)) {
+		currentNode.children[qualifier] = new DocTree(null, null);
+	}
+
+	processPath(currentNode.children[qualifier], path, jsdoc);
+}
+
+function processJSDocItem(jsdoc) {
+	// TODO: Remove
+	if (!(jsdoc.longname.lastIndexOf("ts.activity.ActivityFilterBase", 0) === 0 ||
+		jsdoc.longname.lastIndexOf("ts.activity.ActivityViewBase", 0) === 0)) {
+		return;
+	}
+
+	// Only handle global, instance, static
+	if (jsdoc.scope === "inner") {
+		return;
+	}
+
+	// TODO: Build DocTree
+	console.log(jsdoc.longname + ": " + getPath(jsdoc.longname).toString());
+
+	// var currentNode = docTree;
+	// for (var key in currentNode.children) {
+	// 	if (currentNode.children.hasOwnProperty(key)) {
+	// 		alert(key + " -> " + p[key]);
+	// 	}
+	// }
+
+	processPath(docTree, getPath(jsdoc.longname), jsdoc);
+
+	// TODO: Remove
+	return;
+
+	// TODO: Add author
+	// TODO: Add borrowed / extends / inherited / inherits
+	// TODO: Add copyright
+	// TODO: Add defaultvalue (and defaultvaluetype)
+	// TODO: Add deprecated
+	// TODO: Add exceptions
+	// TODO: Add (member): optional
+	// TODO: Add (member): overrides
+	// TODO: Add (member): readonly
+	// TODO: Add (member): virtual
+
+	// TODO: Handle constant, param
+	switch (data[i].kind) {
+		case "class":
+			return processClass(data[i]);
+		case "function":
+			return processMethod(data[i]);
+		case "member":
+			return processMember(data[i]);
+		default:
+			console.log("Not yet supported: " + data[i].kind);
+			break;
+	}
+}
+
+function processFile(inFile, outDir)
+{
+	rawData = fs.readFileSync(inFile, 'utf8');
+	data = JSON.parse(rawData);
 
 	var fileContent = ""
 	for (var i = 0; i < data.length; i++)
 	{
-		// TODO: Remove
-		if (!(data[i].longname.lastIndexOf("ts.activity.ActivityFilterBase", 0) === 0 ||
-			data[i].longname.lastIndexOf("ts.activity.ActivityViewBase", 0) === 0)) {
-			continue;
-		}
-
-		// Only handle global, instance, static
-		if (data[i].scope === "inner") {
-			continue;
-		}
-
-		// TODO: Build DocTree
-		path = [];
-		qualifiers = data[i].longname.split('~')[0].split('#');
-		if (qualifiers.length > 1) {
-			path = qualifiers[0].split('.').concat(qualifiers[1]);
-		} else {
-			path = qualifiers[0].split('.');
-		}
-		console.log(data[i].longname + ": " + path.toString());
-
-		// TODO: Remove
-		continue;
-
-		// TODO: Add author
-		// TODO: Add borrowed / extends / inherited / inherits
-		// TODO: Add copyright
-		// TODO: Add defaultvalue (and defaultvaluetype)
-		// TODO: Add deprecated
-		// TODO: Add exceptions
-		// TODO: Add (member): optional
-		// TODO: Add (member): overrides
-		// TODO: Add (member): readonly
-		// TODO: Add (member): virtual
-
-		// TODO: Handle constant, param
-		switch (data[i].kind) {
-			case "class":
-				fileContent += processClass(data[i]);
-				break;
-			case "function":
-				fileContent += processMethod(data[i]);
-				break;
-			case "member":
-				fileContent += processMember(data[i]);
-				break;
-			default:
-				console.log("Not yet supported: " + data[i].kind);
-				break;
-		}
+		fileContent += processJSDocItem(data[i]);
 	}
+	
+	// TODO: Remove
+	console.log(docTree);
 
 	saveFile(outDir + '/out.js', fileContent);
 }
@@ -209,8 +249,6 @@ function saveFile(file, data)
 			console.log('Error: Cannot save output file ' + file);
 			process.exit(1);
 		}
-
-		console.log('Finished.');
 	});
 }
 
@@ -233,11 +271,11 @@ function main()
 	var argv = getArgv();
 
 	var inFile = argv.in;
-	outDir = argv.out;
+	var outDir = argv.out;
 
 	console.log('Input file: ' + inFile + '\nOutput dir: ' + outDir);
 
-	process(inFile);
+	processFile(inFile, outDir);
 }
 
 main();
