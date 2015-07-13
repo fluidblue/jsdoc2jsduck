@@ -112,6 +112,9 @@ function processJSDoc(jsdoc) {
 		case "member":
 		case "constant":
 			return processMember(jsdoc);
+		case "package":
+			// Ignore, because JSDuck builds package list automatically.
+			return "";
 		default:
 			console.log("Not yet supported: " + jsdoc.kind);
 			return "";
