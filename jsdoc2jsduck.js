@@ -62,6 +62,20 @@ function processPath(currentNode, path, jsdoc) {
 	processPath(currentNode.children[qualifier], path, jsdoc);
 }
 
+function isInnerItem(jsdoc) {
+	if (jsdoc.scope === "inner") {
+		return true;
+	}
+	if (jsdoc.longname.indexOf("~") > -1) {
+		return true;
+	}
+	// TODO: Check if global functions match this
+	if (jsdoc.longname.split("#").length > 2) {
+		return true;
+	}
+	return false;
+}
+
 function addItemToDocTree(docTree, jsdoc) {
 	// TODO: Remove
 	if (!(jsdoc.longname.lastIndexOf("ts.activity.ActivityFilterBase", 0) === 0 ||
@@ -69,8 +83,8 @@ function addItemToDocTree(docTree, jsdoc) {
 		return;
 	}
 
-	// Only handle global, instance, static
-	if (jsdoc.scope === "inner") {
+	// Only handle outer items
+	if (isInnerItem(jsdoc)) {
 		return;
 	}
 
@@ -98,7 +112,7 @@ function processJSDoc(jsdoc) {
 		case "member":
 			return processMember(jsdoc);
 		default:
-			console.log("Not yet supported: " + data[i].kind);
+			console.log("Not yet supported: " + jsdoc.kind);
 			return "";
 	}
 }
@@ -172,14 +186,21 @@ function docReturn(returns) {
 	if (!returns) {
 		return "";
 	}
+
+	var doc = "";
 	for (var i = 0; i < returns.length; i++) {
+		if (returns[i] === null) {
+			// Return tag was empty
+			continue;
+		}
+
 		var type = generateType(returns[i].type);
 		var description = returns[i].description ? " " + returns[i].description : "";
-		if (type.length + description.length <= 0) {
-			return "";
+		if (type.length + description.length > 0) {
+			doc += docLine("@return " + type + description);
 		}
 	}
-	return docLine("@return " + type + description);
+	return doc;
 }
 
 function docAccessLevel(access) {
