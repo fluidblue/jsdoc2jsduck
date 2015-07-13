@@ -19,6 +19,7 @@ var fs = require('fs');
 var path = require('path');
 var optimist = require('optimist');
 
+// TODO: Remove
 debugger;
 
 function DocTree(jsdoc, children) {
@@ -26,10 +27,9 @@ function DocTree(jsdoc, children) {
 	this.children = children;
 }
 
-var docTree = new DocTree(null, null);
-
 function getPath(longname) {
 	path = [];
+	// TODO: Handle "~"
 	qualifiers = longname.split('~')[0].split('#');
 	if (qualifiers.length > 1) {
 		path = qualifiers[0].split('.').concat(qualifiers[1]);
@@ -62,7 +62,7 @@ function processPath(currentNode, path, jsdoc) {
 	processPath(currentNode.children[qualifier], path, jsdoc);
 }
 
-function processJSDocItem(jsdoc) {
+function addItemToDocTree(docTree, jsdoc) {
 	// TODO: Remove
 	if (!(jsdoc.longname.lastIndexOf("ts.activity.ActivityFilterBase", 0) === 0 ||
 		jsdoc.longname.lastIndexOf("ts.activity.ActivityViewBase", 0) === 0)) {
@@ -74,21 +74,10 @@ function processJSDocItem(jsdoc) {
 		return;
 	}
 
-	// TODO: Build DocTree
-	console.log(jsdoc.longname + ": " + getPath(jsdoc.longname).toString());
-
-	// var currentNode = docTree;
-	// for (var key in currentNode.children) {
-	// 	if (currentNode.children.hasOwnProperty(key)) {
-	// 		alert(key + " -> " + p[key]);
-	// 	}
-	// }
-
 	processPath(docTree, getPath(jsdoc.longname), jsdoc);
+}
 
-	// TODO: Remove
-	return;
-
+function processJSDoc(jsdoc) {
 	// TODO: Add author
 	// TODO: Add borrowed / extends / inherited / inherits
 	// TODO: Add copyright
@@ -101,16 +90,26 @@ function processJSDocItem(jsdoc) {
 	// TODO: Add (member): virtual
 
 	// TODO: Handle constant, param
-	switch (data[i].kind) {
+	switch (jsdoc.kind) {
 		case "class":
-			return processClass(data[i]);
+			return processClass(jsdoc);
 		case "function":
-			return processMethod(data[i]);
+			return processMethod(jsdoc);
 		case "member":
-			return processMember(data[i]);
+			return processMember(jsdoc);
 		default:
 			console.log("Not yet supported: " + data[i].kind);
-			break;
+			return "";
+	}
+}
+
+function processDocTree(docTree) {
+	var currentNode = docTree;
+	var output = "";
+	for (var qualifier in currentNode.children) {
+		if (currentNode.children.hasOwnProperty(qualifier)) {
+			// TODO
+		}
 	}
 }
 
@@ -119,15 +118,13 @@ function processFile(inFile, outDir)
 	rawData = fs.readFileSync(inFile, 'utf8');
 	data = JSON.parse(rawData);
 
-	var fileContent = ""
+	var docTree = new DocTree(null, null);
 	for (var i = 0; i < data.length; i++)
 	{
-		fileContent += processJSDocItem(data[i]);
+		addItemToDocTree(docTree, data[i]);
 	}
-	
-	// TODO: Remove
-	console.log(docTree);
 
+	var fileContent = processDocTree(docTree);
 	saveFile(outDir + '/out.js', fileContent);
 }
 
