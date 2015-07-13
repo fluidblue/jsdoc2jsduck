@@ -28,15 +28,8 @@ function DocTree(jsdoc, children) {
 }
 
 function getPath(longname) {
-	path = [];
-	// TODO: Handle "~"
-	qualifiers = longname.split('~')[0].split('#');
-	if (qualifiers.length > 1) {
-		path = qualifiers[0].split('.').concat(qualifiers[1]);
-	} else {
-		path = qualifiers[0].split('.');
-	}
-	return path;
+	// Split on symbols: . # ~
+	return longname.split(new RegExp('[.#~]', 'g'));
 }
 
 function processPath(currentNode, path, jsdoc) {
