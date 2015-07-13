@@ -122,7 +122,9 @@ function processDocTree(docTree) {
 	if (docTree.jsdoc !== null) {
 		output += processJSDoc(docTree.jsdoc);
 	}
-	if (docTree.children !== null) {
+	// TODO: Global functions
+	var processChildren = docTree.jsdoc === null || docTree.jsdoc.kind === "class";
+	if (processChildren && docTree.children !== null) {
 		for (var qualifier in docTree.children) {
 			if (docTree.children.hasOwnProperty(qualifier)) {
 				output += processDocTree(docTree.children[qualifier]);
