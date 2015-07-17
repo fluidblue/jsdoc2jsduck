@@ -69,6 +69,10 @@ function addItemToDocTree(docTree, jsdoc) {
 	// 	return;
 	// }
 
+	if (!isAllowedScope(jsdoc.scope)) {
+		return;
+	}
+
 	processPath(docTree, getPath(jsdoc.longname), jsdoc);
 }
 
@@ -122,10 +126,10 @@ function isAllowedScope(scope) {
 function processDocTree(docTree, parentKind) {
 	var output = "";
 	if (docTree.jsdoc !== null) {
-		if (isAllowedChild(parentKind, docTree.jsdoc.kind) && isAllowedScope(docTree.jsdoc.scope)) {
+		if (isAllowedChild(parentKind, docTree.jsdoc.kind)) {
 			output += processJSDoc(docTree.jsdoc);
 		} else {
-			//console.log("Filtered: " + docTree.jsdoc.longname);
+			console.log("Filtered: " + docTree.jsdoc.longname);
 		}
 		parentKind = docTree.jsdoc.kind;
 	}
