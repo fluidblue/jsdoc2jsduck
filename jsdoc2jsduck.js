@@ -24,10 +24,28 @@ var filter = null;
 // TODO: Remove
 debugger;
 
-function DocTree(jsdoc, children) {
-	this.jsdoc = jsdoc;
-	this.children = children;
+function DocTree() {
+	this.jsdocs = null;
+	this.children = null;
 }
+
+DocTree.prototype.addJSDoc = function(jsdoc) {
+	if (this.jsdocs === null) {
+		this.jsdocs = [jsdoc];
+	} else {
+		this.jsdocs.push(jsdoc);
+	}
+};
+
+DocTree.prototype.putNewChild = function(qualifier) {
+	if (this.children === null) {
+		this.children = {};
+	}
+	if (!this.children.hasOwnProperty(qualifier)) {
+		this.children[qualifier] = new DocTree();
+	}
+	return this.children[qualifier];
+};
 
 function getPath(longname) {
 	// Split on symbols: . # ~
@@ -36,30 +54,14 @@ function getPath(longname) {
 
 function processPath(currentNode, path, jsdoc) {
 	if (path.length === 0) {
-		if (currentNode.jsdoc !== null) {
-			if (currentNode.jsdoc.longname === jsdoc.longname) {
-				console.log("Warning: Multiple jsdoc entries for " + jsdoc.longname);
-			} else {
-				console.log("Warning: Multiple jsdoc entries. Overwriting " + currentNode.jsdoc.longname +
-					" with " + jsdoc.longname);
-			}
-		}
-		// Add jsdoc to tree
-		currentNode.jsdoc = jsdoc;
-
+		currentNode.addJSDoc(jsdoc);
 		return;
 	}
 
 	var qualifier = path.shift();
+	var child = currentNode.putNewChild(qualifier);
 
-	if (currentNode.children === null) {
-		currentNode.children = {};
-	}
-	if (!currentNode.children.hasOwnProperty(qualifier)) {
-		currentNode.children[qualifier] = new DocTree(null, null);
-	}
-
-	processPath(currentNode.children[qualifier], path, jsdoc);
+	processPath(child, path, jsdoc);
 }
 
 function addItemToDocTree(docTree, jsdoc) {
@@ -125,13 +127,27 @@ function isAllowedScope(scope) {
 
 function processDocTree(docTree, parentKind) {
 	var output = "";
-	if (docTree.jsdoc !== null) {
-		if (isAllowedChild(parentKind, docTree.jsdoc.kind)) {
-			output += processJSDoc(docTree.jsdoc);
-		} else {
-			console.log("Filtered: " + docTree.jsdoc.longname);
+	if (docTree.jsdocs !== null) {
+		var allowedJSDocs = [];
+		for (var i = 0; i < docTree.jsdocs.length; i++) {
+			if (isAllowedChild(parentKind, docTree.jsdocs[i].kind)) {
+				allowedJSDocs.push(docTree.jsdocs[i]);
+			} else {
+				console.log("Filtered: " + docTree.jsdocs[i].longname);
+			}
 		}
-		parentKind = docTree.jsdoc.kind;
+		for (var i = 0; i < allowedJSDocs.length; i++) {
+			output += processJSDoc(allowedJSDocs[i]);
+
+			// TODO: Check
+			parentKind = allowedJSDocs[i].kind;
+
+			if (i >= 1) {
+				console.log("Warning: Multiple JSDocs found for " + allowedJSDocs[i].longname);
+				// TODO
+				return;
+			}
+		}
 	}
 	if (parentKind === "root") {
 		parentKind = "package";
@@ -155,9 +171,9 @@ function processFile(inFile, outDir)
 {
 	data = readJSONFile(inFile);
 
-	var docTree = new DocTree(null, null);
 	for (var i = 0; i < data.length; i++)
 	{
+	var docTree = new DocTree();
 		addItemToDocTree(docTree, data[i]);
 	}
 
