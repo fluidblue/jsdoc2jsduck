@@ -1,0 +1,46 @@
+{
+	"allowedChildren": {
+		"root": [
+			"package",
+			"class",
+			"function",
+			"member",
+			"constant"
+		],
+		"package": [
+			"package",
+			"class",
+			"function",
+			"member",
+			"constant"
+		],
+		"class": [
+			"package",
+			"class",
+			"function",
+			"member",
+			"constant"
+		],
+		"function": [
+			"package",
+			"class",
+			"function",
+			"member",
+			"constant"
+		],
+		"member": [
+			"package",
+			"class",
+			"function",
+			"member",
+			"constant"
+		],
+		"constant": [
+			"package",
+			"class",
+			"function",
+			"member",
+			"constant"
+		]
+	}
+}

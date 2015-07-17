@@ -1,0 +1,27 @@
+{
+	"allowedScopes": [
+		"class",
+		"instance",
+		"static"
+	],
+	"allowedChildren": {
+		"root": [
+			"package"
+		],
+		"package": [
+			"class",
+			"function",
+			"member",
+			"constant"
+		],
+		"class": [
+			"class",
+			"function",
+			"member",
+			"constant"
+		],
+		"function": [],
+		"member": [],
+		"constant": []
+	}
+}
