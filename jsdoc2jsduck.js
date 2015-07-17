@@ -110,16 +110,14 @@ function processJSDoc(jsdoc) {
 }
 
 function isAllowedChild(parentKind, childKind) {
-	if (filter === null || !filter.allowedChildren || !filter.allowedChildren.hasOwnProperty(parentKind))
-	{
+	if (filter === null || !filter.allowedChildren || !filter.allowedChildren.hasOwnProperty(parentKind)) {
 		return true;
 	}
 	return filter.allowedChildren[parentKind].indexOf(childKind) > -1;
 }
 
 function isAllowedScope(scope) {
-	if (filter === null || !filter.allowedScopes)
-	{
+	if (filter === null || !filter.allowedScopes) {
 		return true;
 	}
 	return filter.allowedScopes.indexOf(scope) > -1;
@@ -171,9 +169,8 @@ function processFile(inFile, outDir)
 {
 	data = readJSONFile(inFile);
 
-	for (var i = 0; i < data.length; i++)
-	{
 	var docTree = new DocTree();
+	for (var i = 0; i < data.length; i++) {
 		addItemToDocTree(docTree, data[i]);
 	}
 
@@ -188,8 +185,7 @@ function generateType(type) {
 
 	var docType = ""
 	for (var i = 0; i < type.names.length; i++) {
-		if (docType.length > 0)
-		{
+		if (docType.length > 0) {
 			docType += "|";
 		}
 		docType += type.names[i];
@@ -300,20 +296,16 @@ function docEnd(doc) {
 	return doc + '\n */\n';
 }
 
-function saveFile(file, data)
-{
-	fs.writeFile(file, data, function (err)
-	{
-		if (err)
-		{
+function saveFile(file, data) {
+	fs.writeFile(file, data, function (err) {
+		if (err) {
 			console.log('Error: Cannot save output file ' + file);
 			process.exit(1);
 		}
 	});
 }
 
-function getArgv()
-{
+function getArgv() {
 	return optimist.usage('jsdoc2jsduck.\nUsage: $0')
 		.demand('i')
 		.alias('i', 'in')
@@ -330,8 +322,7 @@ function getArgv()
 		.argv;
 }
 
-function main()
-{
+function main() {
 	var argv = getArgv();
 
 	var inFile = argv.in;
