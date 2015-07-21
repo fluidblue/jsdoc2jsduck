@@ -251,7 +251,7 @@ function processFile2(inFile, outDir) {
 		path = getPath(missingParents[i]);
 		name = path.pop();
 		classData = {
-			comment: "",
+			description: "",
 			kind: "class",
 			access: "public",
 			name: name,
@@ -414,8 +414,10 @@ function processClass(item) {
 	}
 	doc += docAccessLevel(item.access);
 	doc += docLine(item.description);
-	doc += docLine("@constructor");
-	doc += docParams(item.params);
+	if (item.meta) {
+		doc += docLine("@constructor");
+		doc += docParams(item.params);
+	}
 
 	return docEnd(doc);
 }
