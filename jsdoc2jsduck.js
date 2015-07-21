@@ -92,7 +92,7 @@ function readJSONFile(inFile) {
 	return JSON.parse(data);
 }
 
-function processFile2(inFile, outDir) {
+function processFile(inFile, outDir) {
 	data = readJSONFile(inFile);
 
 	var fileContent = "";
@@ -337,7 +337,7 @@ function main() {
 		filter = readJSONFile(filterFile);
 	}
 
-	processFile2(inFile, outDir);
+	processFile(inFile, outDir);
 }
 
 main();
