@@ -92,6 +92,10 @@ function processJSDoc(jsdoc) {
 	// TODO: Add (member): readonly
 	// TODO: Add (member): virtual
 
+	if (jsdoc.undocumented) {
+		console.log("Warning: Missing JSDoc for " + jsdoc.longname);
+	}
+
 	// TODO: Handle constant, param
 	switch (jsdoc.kind) {
 		case "class":
@@ -256,13 +260,13 @@ function processFile2(inFile, outDir) {
 			access: "public",
 			name: name,
 			longname: missingParents[i],
-			scope: "static"
+			scope: "static",
+			undocumented: true
 		};
 		if (path.length > 1) {
 			classData.memberof = path.join(".");
 		}
 		data.push(classData);
-		console.log("Warning: Missing JSDoc for class " + classData.longname);
 	}
 
 	var filterByClass = function(jsdoc) {
