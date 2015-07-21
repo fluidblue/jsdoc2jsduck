@@ -131,9 +131,10 @@ function processDocTree(docTree, parentKind) {
 			if (isAllowedChild(parentKind, docTree.jsdocs[i].kind)) {
 				allowedJSDocs.push(docTree.jsdocs[i]);
 			} else {
-				console.log("Filtered: " + docTree.jsdocs[i].longname);
+				//console.log("Filtered: " + docTree.jsdocs[i].longname);
 			}
 		}
+		// TODO: Make allowedJSDocs an object; check for .inheritdoc
 		for (var i = 0; i < allowedJSDocs.length; i++) {
 			output += processJSDoc(allowedJSDocs[i]);
 
@@ -143,7 +144,7 @@ function processDocTree(docTree, parentKind) {
 			if (i >= 1) {
 				console.log("Warning: Multiple JSDocs found for " + allowedJSDocs[i].longname);
 				// TODO
-				return;
+				//return;
 			}
 		}
 	}
