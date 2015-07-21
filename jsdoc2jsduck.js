@@ -220,12 +220,42 @@ function readJSONFile(inFile) {
 function processFile2(inFile, outDir) {
 	data = readJSONFile(inFile);
 
-	result = jsonQuery('[kind=class]', {
-		data: data
-	});
+	var fileContent = "";
+	var processedJSDocs = [];
 
-	console.log (result);
-	saveFile(outDir + '/out.js', result);
+	var filterByClass = function(jsdoc) {
+		return jsdoc.kind === "class";
+	}
+	classes = data.filter(filterByClass);
+
+	for (var i = 0; i < classes.length; i++) {
+		fileContent += processJSDoc(classes[i]);
+		processedJSDocs.push(classes[i].longname);
+
+		var filterByMember = function(jsdoc) {
+			return jsdoc.memberof === classes[i].longname &&
+				jsdoc.scope !== "inner";
+		}
+		members = data.filter(filterByMember);
+		for (var j = 0; j < members.length; j++) {
+			fileContent += processJSDoc(members[j]);
+			processedJSDocs.push(members[j].longname);
+		}
+	}
+
+	var filteredJSDocs = [];
+	for (var i = 0; i < data.length; i++) {
+		if (processedJSDocs.indexOf(data[i].longname) === -1) {
+			if (data[i].longname.indexOf("~") === -1 &&
+				data[i].longname.split("#").length < 2 &&
+				data[i].longname.indexOf("ts.") === 0) {
+				filteredJSDocs.push(data[i].longname);
+			}
+		}
+	}
+	console.log(filteredJSDocs);
+
+	saveFile(outDir + '/out.js', fileContent);
 }
 
 function processFile(inFile, outDir)
