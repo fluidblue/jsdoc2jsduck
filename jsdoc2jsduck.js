@@ -138,6 +138,7 @@ function processFile(inFile, outDir) {
 			classData.memberof = path.join(".");
 		}
 		data.push(classData);
+		console.log("Warning: Missing class definition for " + classData.longname);
 	}
 
 	var filterByClass = function(jsdoc) {
