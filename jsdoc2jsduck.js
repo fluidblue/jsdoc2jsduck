@@ -161,18 +161,17 @@ function processFile(inFile, outDir) {
 		}
 	}
 
-	var filteredJSDocs = [];
 	for (var i = 0; i < data.length; i++) {
 		if (processedJSDocs.indexOf(data[i].longname) === -1) {
 			if (data[i].longname.indexOf("~") === -1 &&
 				data[i].longname.split("#").length < 2 &&
 				data[i].longname.indexOf("ts.") === 0 &&
 				missingParents.indexOf(data[i].memberof) === -1) {
-				filteredJSDocs.push(data[i].longname);
+
+				console.log("Warning: Ignoring JSDoc for " + data[i].longname);
 			}
 		}
 	}
-	console.log(filteredJSDocs);
 
 	saveFile(outDir + '/out.js', fileContent);
 }
