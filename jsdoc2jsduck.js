@@ -223,6 +223,48 @@ function processFile2(inFile, outDir) {
 	var fileContent = "";
 	var processedJSDocs = [];
 
+	var missingParents = [];
+	loop1:
+	for (var i = 0; i < data.length; i++) {
+		if (!data[i].memberof || data[i].kind === "class") {
+			continue loop1;
+		}
+
+		loop2:
+		for (var j = 0; j < data.length; j++) {
+			if (data[i].memberof === data[j].longname) {
+				continue loop1;
+			}
+		}
+
+		if (data[i].longname.indexOf("~") === -1 &&
+			data[i].longname.split("#").length < 2 &&
+			data[i].longname.indexOf("ts.") === 0) {
+
+			if (missingParents.indexOf(data[i].memberof) === -1) {
+				missingParents.push(data[i].memberof);
+			}
+			//console.log("Missing parent " + data[i].memberof + " for " + data[i].longname);
+		}
+	}
+	for (var i = 0; i < missingParents.length; i++) {
+		path = getPath(missingParents[i]);
+		name = path.pop();
+		classData = {
+			comment: "",
+			kind: "class",
+			access: "public",
+			name: name,
+			longname: missingParents[i],
+			scope: "static"
+		};
+		if (path.length > 1) {
+			classData.memberof = path.join(".");
+		}
+		data.push(classData);
+		console.log("Warning: Missing documentation for class " + classData.longname);
+	}
+
 	var filterByClass = function(jsdoc) {
 		return jsdoc.kind === "class";
 	}
@@ -248,7 +290,8 @@ function processFile2(inFile, outDir) {
 		if (processedJSDocs.indexOf(data[i].longname) === -1) {
 			if (data[i].longname.indexOf("~") === -1 &&
 				data[i].longname.split("#").length < 2 &&
-				data[i].longname.indexOf("ts.") === 0) {
+				data[i].longname.indexOf("ts.") === 0 &&
+				missingParents.indexOf(data[i].memberof) === -1) {
 				filteredJSDocs.push(data[i].longname);
 			}
 		}
