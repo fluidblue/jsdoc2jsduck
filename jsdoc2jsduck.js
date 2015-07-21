@@ -217,6 +217,20 @@ function readJSONFile(inFile) {
 	return JSON.parse(data);
 }
 
+function processFile2(inFile, outDir) {
+	data = {
+		jsdocs: readJSONFile(inFile)
+	};
+
+	result = jsonQuery('jsdocs[kind=class]', {
+		data: data
+	});
+
+	console.log(result);
+
+	saveFile(outDir + '/out.js', result);
+}
+
 function processFile(inFile, outDir)
 {
 	data = readJSONFile(inFile);
@@ -389,7 +403,7 @@ function main() {
 		filter = readJSONFile(filterFile);
 	}
 
-	processFile(inFile, outDir);
+	processFile2(inFile, outDir);
 }
 
 main();
