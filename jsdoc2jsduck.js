@@ -262,7 +262,7 @@ function processFile2(inFile, outDir) {
 			classData.memberof = path.join(".");
 		}
 		data.push(classData);
-		console.log("Warning: Missing documentation for class " + classData.longname);
+		console.log("Warning: Missing JSDoc for class " + classData.longname);
 	}
 
 	var filterByClass = function(jsdoc) {
