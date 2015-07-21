@@ -1,6 +1,5 @@
 {
 	"allowedScopes": [
-		"class",
 		"instance",
 		"static"
 	],

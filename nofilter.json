@@ -1,4 +1,10 @@
 {
+	"allowedScopes": [
+		"global",
+		"inner",
+		"instance",
+		"static"
+	],
 	"allowedChildren": {
 		"root": [
 			"package",
