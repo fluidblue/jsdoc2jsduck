@@ -25,59 +25,9 @@ var filter = null;
 // TODO: Remove
 debugger;
 
-function DocTree() {
-	this.jsdocs = null;
-	this.children = null;
-}
-
-DocTree.prototype.addJSDoc = function(jsdoc) {
-	if (this.jsdocs === null) {
-		this.jsdocs = [jsdoc];
-	} else {
-		this.jsdocs.push(jsdoc);
-	}
-};
-
-DocTree.prototype.putNewChild = function(qualifier) {
-	if (this.children === null) {
-		this.children = {};
-	}
-	if (!this.children.hasOwnProperty(qualifier)) {
-		this.children[qualifier] = new DocTree();
-	}
-	return this.children[qualifier];
-};
-
 function getPath(longname) {
 	// Split on symbols: . # ~
 	return longname.split(new RegExp('[.#~]', 'g'));
-}
-
-function processPath(currentNode, path, jsdoc) {
-	if (path.length === 0) {
-		currentNode.addJSDoc(jsdoc);
-		return;
-	}
-
-	var qualifier = path.shift();
-	var child = currentNode.putNewChild(qualifier);
-
-	processPath(child, path, jsdoc);
-}
-
-function addItemToDocTree(docTree, jsdoc) {
-	// TODO: Remove
-	// if (!(jsdoc.longname.lastIndexOf("ts.activity.ActivityFilterBase", 0) === 0 ||
-	// 	jsdoc.longname.lastIndexOf("ts.activity.ActivityViewBase", 0) === 0)) {
-	// 	return;
-	// }
-
-	if (!isAllowedScope(jsdoc.scope)) {
-		//console.log("Filtered by allowedScope: " + jsdoc.longname);
-		return;
-	}
-
-	processPath(docTree, getPath(jsdoc.longname), jsdoc);
 }
 
 function processJSDoc(jsdoc) {
@@ -135,85 +85,6 @@ function isAllowedPackage(scope) {
 	}
 	// TODO
 	return true;
-}
-
-function getKindPrecedence(kind) {
-	switch (kind) {
-		case 'package': return 0;
-
-		case 'class': return 0;
-		case 'interface': return 0;
-		case 'function': return 0;
-		
-		case 'member': return 0;
-		case 'constant': return 0;
-
-		case 'event': return 0;
-		case 'external': return 0;
-		case 'file': return 0;
-		
-		
-		case 'mixin': return 0;
-		case 'module': return 0;
-		case 'namespace': return 0;
-		
-		case 'param': return 0;
-		case 'typedef': return 0;
-		default: return 0;
-	}
-}
-
-function processDocTree(docTree, parentKind) {
-	var output = "";
-	if (docTree.jsdocs !== null) {
-		var allowedJSDocs = {};
-		for (var i = 0; i < docTree.jsdocs.length; i++) {
-			var jsdoc = docTree.jsdocs[i];
-			if (!isAllowedChild(parentKind, jsdoc.kind)) {
-				//console.log("Filtered by allowedChildren: " + jsdoc.longname);
-				continue;
-			}
-			if (!isAllowedPackage(jsdoc.longname)) {
-				//console.log("Filtered by allowedPackages: " + jsdoc.longname);
-				continue;
-			}
-			if (allowedJSDocs.hasOwnProperty(jsdoc.longname)) {
-				if (allowedJSDocs[jsdoc.longname].inheritdoc && !jsdoc.inheritdoc) {
-					allowedJSDocs[jsdoc.longname] = jsdoc;
-				} else if (!allowedJSDocs[jsdoc.longname].inheritdoc && jsdoc.inheritdoc) {
-					// Discard current jsdoc
-				} else {
-					console.log("Warning: Multiple JSDocs found for " + jsdoc.longname);
-					// TODO: Decide by kind precedence
-				}
-			} else {
-				allowedJSDocs[jsdoc.longname] = jsdoc;
-			}
-		}
-		if (Object.keys(allowedJSDocs).length > 1) {
-			console.log("Warning: Multiple JSDocs found for path " + getPath(jsdoc.longname));
-		}
-		// TODO: Check for precedence, check for "memberof"
-		for (var longname in allowedJSDocs) {
-			if (!allowedJSDocs.hasOwnProperty(longname)) {
-				continue;
-			}
-
-			output += processJSDoc(allowedJSDocs[longname]);
-			parentKind = allowedJSDocs[longname].kind;
-		}
-	}
-	if (parentKind === "root") {
-		parentKind = "package";
-	}
-	if (docTree.children !== null) {
-		for (var qualifier in docTree.children) {
-			if (docTree.children.hasOwnProperty(qualifier)) {
-				output += processDocTree(docTree.children[qualifier], parentKind);
-			}
-		}
-	}
-	return output;
 }
 
 function readJSONFile(inFile) {
@@ -302,19 +173,6 @@ function processFile2(inFile, outDir) {
 	}
 	console.log(filteredJSDocs);
 
-	saveFile(outDir + '/out.js', fileContent);
-}
-
-function processFile(inFile, outDir)
-{
-	data = readJSONFile(inFile);
-
-	var docTree = new DocTree();
-	for (var i = 0; i < data.length; i++) {
-		addItemToDocTree(docTree, data[i]);
-	}
-
-	var fileContent = processDocTree(docTree, "root");
 	saveFile(outDir + '/out.js', fileContent);
 }
 
