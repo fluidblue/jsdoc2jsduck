@@ -72,7 +72,7 @@ function addItemToDocTree(docTree, jsdoc) {
 	// }
 
 	if (!isAllowedScope(jsdoc.scope)) {
-		console.log("Filtered by allowedScope: " + jsdoc.longname);
+		//console.log("Filtered by allowedScope: " + jsdoc.longname);
 		return;
 	}
 
@@ -132,7 +132,7 @@ function processDocTree(docTree, parentKind) {
 			if (isAllowedChild(parentKind, docTree.jsdocs[i].kind)) {
 				allowedJSDocs.push(docTree.jsdocs[i]);
 			} else {
-				console.log("Filtered by allowedChildren: " + docTree.jsdocs[i].longname);
+				//console.log("Filtered by allowedChildren: " + docTree.jsdocs[i].longname);
 			}
 		}
 		// TODO: Make allowedJSDocs an object; check for .inheritdoc
