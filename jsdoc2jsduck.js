@@ -218,16 +218,13 @@ function readJSONFile(inFile) {
 }
 
 function processFile2(inFile, outDir) {
-	data = {
-		jsdocs: readJSONFile(inFile)
-	};
+	data = readJSONFile(inFile);
 
-	result = jsonQuery('jsdocs[kind=class]', {
+	result = jsonQuery('[kind=class]', {
 		data: data
 	});
 
-	console.log(result);
-
+	console.log (result);
 	saveFile(outDir + '/out.js', result);
 }
 
