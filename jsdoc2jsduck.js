@@ -187,32 +187,58 @@ function createNamedData(data) {
 	return namedData;
 }
 
-function removeDuplicates(namedData) {
-	var filterFunctions = [
-		function(jsdoc) {
-			return jsdoc.inheritdoc === undefined;
-		},
-		// function(jsdoc) {
-		// 	if (jsdoc.ignore === true) {
-		// 		console.log(jsdoc);
-		// 	}
-		// 	return jsdoc.ignore === true;
-		// }
-	];
-
+function removeInheritdocItems(namedData) {
 	for (var longname in namedData) {
 		if (!namedData.hasOwnProperty(longname)) {
 			continue;
 		}
 
-		for (var i = 0; i < filterFunctions.length; i++) {
-			var jsdocs = namedData[longname].filter(filterFunctions[i]);
+		var filterByInheritdoc = function(jsdoc) {
+			// Remove "inheritdoc" items, which contain no valuable information.
+			return jsdoc.inheritdoc === undefined;
+		};
+		var jsdocs = namedData[longname].filter(filterByInheritdoc);
 
-			if (jsdocs.length > 0) {
-				namedData[longname] = jsdocs;
-			}
+		// Only apply filter when other JSDocs exist.
+		if (jsdocs.length > 0) {
+			namedData[longname] = jsdocs;
 		}
 	}
+}
+
+function removeInheritedDocs(namedData) {
+	for (var longname in namedData) {
+		if (!namedData.hasOwnProperty(longname)) {
+			continue;
+		}
+
+		var filterInheritedDocs = function(jsdoc) {
+			// Remove docs for inherited but not overriden members for which an
+			// JSDoc exist. JSDuck will add inherited methods to classes automatically with
+			// inheritance information.
+			var removeDoc = jsdoc.inherits !== undefined &&
+				jsdoc.overrides === undefined &&
+				namedData.hasOwnProperty(jsdoc.inherits);
+			if (removeDoc) {
+				console.log("Filtered: " + jsdoc.longname);
+			}
+			return !removeDoc;
+		}
+		var jsdocs = namedData[longname].filter(filterInheritedDocs);
+		if (jsdocs.length > 0) {
+			namedData[longname] = jsdocs;
+		} else {
+			delete namedData[longname];
+		}
+	}
+}
+
+function removeDuplicates(namedData) {
+	testForItemsWithMultipleEntries(namedData);
+	removeInheritdocItems(namedData);
+	testForItemsWithMultipleEntries(namedData);
+	removeInheritedDocs(namedData);
+	testForItemsWithMultipleEntries(namedData);
 }
 
 function testForItemsWithMultipleEntries(namedData) {
@@ -220,6 +246,7 @@ function testForItemsWithMultipleEntries(namedData) {
 	for (var longname in namedData) {
 		if (namedData.hasOwnProperty(longname)) {
 			if (namedData[longname].length > 1) {
+				var test = namedData[longname];
 				//console.log("Multiple entries for " + longname + ": " + namedData[longname].length);
 				//console.log(namedData[longname]);
 				itemsWithMultipleEntries++;
@@ -229,6 +256,19 @@ function testForItemsWithMultipleEntries(namedData) {
 	console.log("itemsWithMultipleEntries: " + itemsWithMultipleEntries);
 }
 
+function convertNamedDataToData(namedData) {
+	var data = [];
+	for (var longname in namedData) {
+		if (!namedData.hasOwnProperty(longname)) {
+			continue;
+		}
+		for (var i = 0; i < namedData[longname].length; i++) {
+			data.push(namedData[longname][i]);
+		}
+	}
+	return data;
+}
+
 function processFile(inFile, outDir) {
 	data = readJSONFile(inFile);
 
@@ -236,9 +276,8 @@ function processFile(inFile, outDir) {
 	//testForInheritdocsWithMissingInherited(data);
 
 	var namedData = createNamedData(data);
-	testForItemsWithMultipleEntries(namedData);
 	removeDuplicates(namedData);
-	testForItemsWithMultipleEntries(namedData);
+	data = convertNamedDataToData(namedData);
 
 	var fileContent = '';
 	var processedJSDocs = [];
