@@ -36,7 +36,6 @@ function processJSDoc(jsdoc) {
 	// TODO: Add author
 	// TODO: Add copyright
 	// TODO: Add defaultvalue (and defaultvaluetype)
-	// TODO: Add deprecated
 	// TODO: Add exceptions
 	// TODO: Add (member): optional
 	// TODO: Add (member): virtual
@@ -381,6 +380,9 @@ function processMember(item) {
 
 	doc += docLine('@property ' + generateType(item.type) + item.name);
 	doc += docAccessLevel(item.access);
+	if (item.deprecated === true) {
+		doc += docLine('@deprecated');
+	}
 	if (item.kind === 'constant') {
 		doc += docLine('@readonly');
 	}
@@ -397,6 +399,9 @@ function processMethod(item) {
 
 	doc += docLine('@method ' + item.name);
 	doc += docAccessLevel(item.access);
+	if (item.deprecated === true) {
+		doc += docLine('@deprecated');
+	}
 	if (item.scope === "static") {
 		doc += docLine("@static");
 	}
@@ -425,6 +430,9 @@ function processClass(item) {
 		}
 	}
 	doc += docAccessLevel(item.access);
+	if (item.deprecated === true) {
+		doc += docLine('@deprecated');
+	}
 	doc += docLine(item.description);
 	if (isStaticClass(item)) {
 		doc += docLine('@static');
