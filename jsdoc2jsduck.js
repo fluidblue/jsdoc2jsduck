@@ -327,9 +327,9 @@ function getArgv() {
 function main() {
 	var argv = getArgv();
 
-	var inFile = argv.in;
-	var outDir = argv.out;
-	var filterFile = argv.filter;
+	var inFile = path.resolve(argv.in);
+	var outDir = path.resolve(argv.out);
+	var filterFile = path.resolve(argv.filter);
 
 	console.log('Input file: ' + inFile);
 	console.log('Output dir: ' + outDir);
