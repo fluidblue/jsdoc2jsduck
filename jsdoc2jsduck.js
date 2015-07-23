@@ -268,6 +268,13 @@ function processMethod(item) {
 	return docEnd(doc);
 }
 
+function isStaticClass(jsdoc) {
+	return jsdoc.kind === "class" &&
+		jsdoc.meta &&
+		jsdoc.meta.code &&
+		jsdoc.meta.code.type === "MemberExpression";
+}
+
 function processClass(item) {
 	var doc = docBegin();
 
@@ -279,10 +286,11 @@ function processClass(item) {
 	}
 	doc += docAccessLevel(item.access);
 	doc += docLine(item.description);
-	if (item.meta) {
-		// TODO: Check for static classes
+	if (!isStaticClass(item)) {
 		doc += docLine('@constructor');
 		doc += docParams(item.params);
+	} else {
+		console.log("Info: Static class found: " + item.longname);
 	}
 
 	return docEnd(doc);
