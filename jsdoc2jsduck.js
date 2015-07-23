@@ -43,7 +43,7 @@ function processJSDoc(jsdoc) {
 	// TODO: Add (member): virtual
 
 	if (jsdoc.undocumented) {
-		console.log("Warning: Missing JSDoc for " + jsdoc.longname);
+		console.error("Warning: Missing JSDoc for " + jsdoc.longname);
 	}
 
 	// TODO: Handle constant, param
@@ -59,7 +59,7 @@ function processJSDoc(jsdoc) {
 			// Ignore, because JSDuck builds package list automatically.
 			return "";
 		default:
-			console.log("Unsupported documentation type (" + jsdoc.kind + ") in file "
+			console.error("Unsupported documentation type (" + jsdoc.kind + ") in file "
 				+ jsdoc.meta.path + "/" + jsdoc.meta.filename + ":" + jsdoc.meta.lineno);
 			return "";
 	}
@@ -121,7 +121,7 @@ function processFile(inFile, outDir) {
 			if (missingParents.indexOf(data[i].memberof) === -1) {
 				missingParents.push(data[i].memberof);
 			}
-			//console.log("Missing parent " + data[i].memberof + " for " + data[i].longname);
+			//console.error("Missing parent " + data[i].memberof + " for " + data[i].longname);
 		}
 	}
 	for (var i = 0; i < missingParents.length; i++) {
@@ -140,7 +140,7 @@ function processFile(inFile, outDir) {
 			classData.memberof = path.join(".");
 		}
 		data.push(classData);
-		console.log("Warning: Missing class definition for " + classData.longname);
+		console.error("Warning: Missing class definition for " + classData.longname);
 	}
 
 	var filterByClass = function(jsdoc) {
@@ -170,7 +170,7 @@ function processFile(inFile, outDir) {
 				isAllowedPackage(data[i].longname) &&
 				missingParents.indexOf(data[i].memberof) === -1) {
 
-				console.log("Warning: Ignoring " + data[i].longname);
+				console.error("Warning: Ignoring " + data[i].longname);
 			}
 		}
 	}
@@ -301,7 +301,7 @@ function docEnd(doc) {
 function saveFile(file, data) {
 	fs.writeFile(file, data, function (err) {
 		if (err) {
-			console.log('Error: Cannot save output file ' + file);
+			console.error('Error: Cannot save output file ' + file);
 			process.exit(1);
 		}
 	});
