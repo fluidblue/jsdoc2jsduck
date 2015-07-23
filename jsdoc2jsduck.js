@@ -95,8 +95,8 @@ function readJSONFile(inFile) {
 	return JSON.parse(data);
 }
 
-function getMissingParents(data) {
-	var missingParents = [];
+function getMissingStaticClasses(data) {
+	var missingStaticClasses = [];
 	outerLoop:
 	for (var i = 0; i < data.length; i++) {
 		if (!data[i].memberof || data[i].kind === 'class') {
@@ -113,25 +113,25 @@ function getMissingParents(data) {
 			data[i].longname.split('#').length < 2 &&
 			isAllowedPackage(data[i].longname)) {
 
-			if (missingParents.indexOf(data[i].memberof) === -1) {
-				missingParents.push(data[i].memberof);
+			if (missingStaticClasses.indexOf(data[i].memberof) === -1) {
+				missingStaticClasses.push(data[i].memberof);
 			}
 			//console.error('Warning: Missing parent ' + data[i].memberof + ' for ' + data[i].longname);
 		}
 	}
-	return missingParents;
+	return missingStaticClasses;
 }
 
-function addMissingStaticClassDefinitions(data, missingParents) {
-	for (var i = 0; i < missingParents.length; i++) {
-		path = getPath(missingParents[i]);
+function addMissingStaticClasses(data, missingStaticClasses) {
+	for (var i = 0; i < missingStaticClasses.length; i++) {
+		path = getPath(missingStaticClasses[i]);
 		name = path.pop();
 		classData = {
 			description: '',
 			kind: 'class',
 			access: 'public',
 			name: name,
-			longname: missingParents[i],
+			longname: missingStaticClasses[i],
 			scope: 'static',
 			undocumentedStaticClass: true
 		};
@@ -149,8 +149,8 @@ function processFile(inFile, outDir) {
 	var fileContent = '';
 	var processedJSDocs = [];
 
-	var missingParents = getMissingParents(data);
-	addMissingStaticClassDefinitions(data, missingParents);
+	var missingStaticClasses = getMissingStaticClasses(data);
+	addMissingStaticClasses(data, missingStaticClasses);
 
 	var filterByClass = function(jsdoc) {
 		return jsdoc.kind === 'class';
@@ -177,7 +177,7 @@ function processFile(inFile, outDir) {
 			if (data[i].longname.indexOf('~') === -1 &&
 				data[i].longname.split('#').length < 2 &&
 				isAllowedPackage(data[i].longname) &&
-				missingParents.indexOf(data[i].memberof) === -1) {
+				missingStaticClasses.indexOf(data[i].memberof) === -1) {
 
 				console.error('Warning: Ignoring ' + data[i].longname);
 			}
