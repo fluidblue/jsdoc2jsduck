@@ -97,6 +97,7 @@ function readJSONFile(inFile) {
 
 function getMissingStaticClasses(data) {
 	var missingStaticClasses = [];
+
 	outerLoop:
 	for (var i = 0; i < data.length; i++) {
 		if (!data[i].memberof || data[i].kind === 'class') {
@@ -116,7 +117,6 @@ function getMissingStaticClasses(data) {
 			if (missingStaticClasses.indexOf(data[i].memberof) === -1) {
 				missingStaticClasses.push(data[i].memberof);
 			}
-			//console.error('Warning: Missing parent ' + data[i].memberof + ' for ' + data[i].longname);
 		}
 	}
 	return missingStaticClasses;
