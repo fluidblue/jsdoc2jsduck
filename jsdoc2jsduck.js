@@ -107,8 +107,7 @@ function getMissingStaticClasses(data) {
 		}
 
 		if (data[i].longname.indexOf('~') === -1 &&
-			data[i].longname.split('#').length < 2 &&
-			isAllowedPackage(data[i].longname)) {
+			data[i].longname.split('#').length < 2) {
 
 			if (missingStaticClasses.indexOf(data[i].memberof) === -1) {
 				missingStaticClasses.push(data[i].memberof);
@@ -286,8 +285,7 @@ function processFile(inFile, outDir) {
 		processedJSDocs.push(classes[i].longname);
 
 		var filterByMember = function(jsdoc) {
-			return jsdoc.memberof === classes[i].longname &&
-				jsdoc.scope !== 'inner';
+			return jsdoc.memberof === classes[i].longname;
 		}
 		members = data.filter(filterByMember);
 		for (var j = 0; j < members.length; j++) {
@@ -300,7 +298,6 @@ function processFile(inFile, outDir) {
 		if (processedJSDocs.indexOf(data[i].longname) === -1) {
 			if (data[i].longname.indexOf('~') === -1 &&
 				data[i].longname.split('#').length < 2 &&
-				isAllowedPackage(data[i].longname) &&
 				missingStaticClasses.indexOf(data[i].memberof) === -1) {
 
 				console.error('Warning: Ignoring ' + data[i].longname);
