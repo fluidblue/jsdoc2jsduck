@@ -431,7 +431,7 @@ function processClass(item) {
 	doc += docLine(item.description);
 	if (isStaticClass(item)) {
 		doc += docLine('@static');
-		console.log("Info: Static class found: " + item.longname);
+		//console.log("Info: Static class found: " + item.longname);
 	} else {
 		doc += docLine('@constructor');
 		doc += docParams(item.params);
