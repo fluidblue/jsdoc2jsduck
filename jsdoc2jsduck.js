@@ -150,8 +150,84 @@ function getClasses(data) {
 	return data.filter(filterByClass);
 }
 
+function testForInheritdocsWithMissingInherited(data) {
+	var inheritdocs = [];
+	var inherited = [];
+	var inheritdocsWithMissingInherited = [];
+	for (var i = 0; i < data.length; i++) {
+		if (data[i].inheritdoc !== undefined) {
+			inheritdocs.push(data[i].longname);
+		}
+		if (data[i].inherited === true) {
+			inherited.push(data[i].longname);
+		}
+	}
+	for (var i = 0; i < inheritdocs.length; i++) {
+		if (inherited.indexOf(inheritdocs[i]) === -1) {
+			inheritdocsWithMissingInherited.push(inheritdocs[i]);
+		}
+	}
+	console.log(inheritdocs.length);
+	console.log(inherited.length);
+	console.log(inheritdocsWithMissingInherited);
+}
+
+function createNamedData(data) {
+	var namedData = {};
+	for (var i = 0; i < data.length; i++) {
+		if (!isAllowedPackage(data[i].longname) || !isAllowedScope(data[i].scope)) {
+			continue;
+		}
+		if (namedData.hasOwnProperty(data[i].longname)) {
+			namedData[data[i].longname].push(data[i]);
+		} else {
+			namedData[data[i].longname] = [data[i]];
+		}
+	}
+	return namedData;
+}
+
+function removeInheritdocs(namedData) {
+	var filterByInheritDoc = function(jsdoc) {
+		return jsdoc.inheritdoc === undefined;
+	};
+
+	for (var longname in namedData) {
+		if (!namedData.hasOwnProperty(longname)) {
+			continue;
+		}
+		var jsdocs = namedData[longname].filter(filterByInheritDoc);
+
+		if (jsdocs.length > 0) {
+			namedData[longname] = jsdocs;
+		}
+	}
+}
+
+function testForItemsWithMultipleEntries(namedData) {
+	var itemsWithMultipleEntries = 0;
+	for (var longname in namedData) {
+		if (namedData.hasOwnProperty(longname)) {
+			if (namedData[longname].length > 1) {
+				//console.log("Multiple entries for " + longname + ": " + namedData[longname].length);
+				//console.log(namedData[longname]);
+				itemsWithMultipleEntries++;
+			}
+		}
+	}
+	console.log("itemsWithMultipleEntries: " + itemsWithMultipleEntries);
+}
+
 function processFile(inFile, outDir) {
 	data = readJSONFile(inFile);
+
+	// TODO: Remove
+	//testForInheritdocsWithMissingInherited(data);
+
+	var namedData = createNamedData(data);
+	testForItemsWithMultipleEntries(namedData);
+	removeInheritdocs(namedData);
+	testForItemsWithMultipleEntries(namedData);
 
 	var fileContent = '';
 	var processedJSDocs = [];
