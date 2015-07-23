@@ -43,25 +43,25 @@ function processJSDoc(jsdoc) {
 	// TODO: Add (member): virtual
 
 	if (jsdoc.undocumented) {
-		console.error("Warning: Missing JSDoc for " + jsdoc.longname);
+		console.error('Warning: Missing JSDoc for ' + jsdoc.longname);
 	}
 
 	// TODO: Handle constant, param
 	switch (jsdoc.kind) {
-		case "class":
+		case 'class':
 			return processClass(jsdoc);
-		case "function":
+		case 'function':
 			return processMethod(jsdoc);
-		case "member":
-		case "constant":
+		case 'member':
+		case 'constant':
 			return processMember(jsdoc);
-		case "package":
+		case 'package':
 			// Ignore, because JSDuck builds package list automatically.
-			return "";
+			return '';
 		default:
-			console.error("Unsupported documentation type (" + jsdoc.kind + ") in file "
-				+ jsdoc.meta.path + "/" + jsdoc.meta.filename + ":" + jsdoc.meta.lineno);
-			return "";
+			console.error('Unsupported documentation type (' + jsdoc.kind + ') in file '
+				+ jsdoc.meta.path + '/' + jsdoc.meta.filename + ':' + jsdoc.meta.lineno);
+			return '';
 	}
 }
 
@@ -97,13 +97,13 @@ function readJSONFile(inFile) {
 function processFile(inFile, outDir) {
 	data = readJSONFile(inFile);
 
-	var fileContent = "";
+	var fileContent = '';
 	var processedJSDocs = [];
 
 	var missingParents = [];
 	loop1:
 	for (var i = 0; i < data.length; i++) {
-		if (!data[i].memberof || data[i].kind === "class") {
+		if (!data[i].memberof || data[i].kind === 'class') {
 			continue loop1;
 		}
 
@@ -114,37 +114,37 @@ function processFile(inFile, outDir) {
 			}
 		}
 
-		if (data[i].longname.indexOf("~") === -1 &&
-			data[i].longname.split("#").length < 2 &&
+		if (data[i].longname.indexOf('~') === -1 &&
+			data[i].longname.split('#').length < 2 &&
 			isAllowedPackage(data[i].longname)) {
 
 			if (missingParents.indexOf(data[i].memberof) === -1) {
 				missingParents.push(data[i].memberof);
 			}
-			//console.error("Missing parent " + data[i].memberof + " for " + data[i].longname);
+			//console.error('Missing parent ' + data[i].memberof + ' for ' + data[i].longname);
 		}
 	}
 	for (var i = 0; i < missingParents.length; i++) {
 		path = getPath(missingParents[i]);
 		name = path.pop();
 		classData = {
-			description: "",
-			kind: "class",
-			access: "public",
+			description: '',
+			kind: 'class',
+			access: 'public',
 			name: name,
 			longname: missingParents[i],
-			scope: "static",
+			scope: 'static',
 			undocumented: true
 		};
 		if (path.length > 1) {
-			classData.memberof = path.join(".");
+			classData.memberof = path.join('.');
 		}
 		data.push(classData);
-		console.error("Warning: Missing class definition for " + classData.longname);
+		console.error('Warning: Missing class definition for ' + classData.longname);
 	}
 
 	var filterByClass = function(jsdoc) {
-		return jsdoc.kind === "class";
+		return jsdoc.kind === 'class';
 	}
 	classes = data.filter(filterByClass);
 
@@ -154,7 +154,7 @@ function processFile(inFile, outDir) {
 
 		var filterByMember = function(jsdoc) {
 			return jsdoc.memberof === classes[i].longname &&
-				jsdoc.scope !== "inner";
+				jsdoc.scope !== 'inner';
 		}
 		members = data.filter(filterByMember);
 		for (var j = 0; j < members.length; j++) {
@@ -165,12 +165,12 @@ function processFile(inFile, outDir) {
 
 	for (var i = 0; i < data.length; i++) {
 		if (processedJSDocs.indexOf(data[i].longname) === -1) {
-			if (data[i].longname.indexOf("~") === -1 &&
-				data[i].longname.split("#").length < 2 &&
+			if (data[i].longname.indexOf('~') === -1 &&
+				data[i].longname.split('#').length < 2 &&
 				isAllowedPackage(data[i].longname) &&
 				missingParents.indexOf(data[i].memberof) === -1) {
 
-				console.error("Warning: Ignoring " + data[i].longname);
+				console.error('Warning: Ignoring ' + data[i].longname);
 			}
 		}
 	}
@@ -180,44 +180,44 @@ function processFile(inFile, outDir) {
 
 function generateType(type) {
 	if (!type || !type.names) {
-		return "";
+		return '';
 	}
 
-	var docType = ""
+	var docType = ''
 	for (var i = 0; i < type.names.length; i++) {
 		if (docType.length > 0) {
-			docType += "|";
+			docType += '|';
 		}
 		docType += type.names[i];
 
 	}
 	if (docType.length > 0) {
-		docType = "{" + docType + "} ";
+		docType = '{' + docType + '} ';
 	}
 	return docType;
 }
 
 function docParams(params) {
 	if (!params) {
-		return "";
+		return '';
 	}
 
-	var doc = "";
+	var doc = '';
 	for (var i = 0; i < params.length; i++) {
 		var type = generateType(params[i].type);
-		var name = params[i].name ? " " + params[i].name : "";
-		var description = params[i].description ? " " + params[i].description : "";
-		doc += docLine("@param " + type + name + description);
+		var name = params[i].name ? ' ' + params[i].name : '';
+		var description = params[i].description ? ' ' + params[i].description : '';
+		doc += docLine('@param ' + type + name + description);
 	}
 	return doc;
 }
 
 function docReturn(returns) {
 	if (!returns) {
-		return "";
+		return '';
 	}
 
-	var doc = "";
+	var doc = '';
 	for (var i = 0; i < returns.length; i++) {
 		if (returns[i] === null) {
 			// Return tag was empty
@@ -225,9 +225,9 @@ function docReturn(returns) {
 		}
 
 		var type = generateType(returns[i].type);
-		var description = returns[i].description ? " " + returns[i].description : "";
+		var description = returns[i].description ? ' ' + returns[i].description : '';
 		if (type.length + description.length > 0) {
-			doc += docLine("@return " + type + description);
+			doc += docLine('@return ' + type + description);
 		}
 	}
 	return doc;
@@ -236,10 +236,10 @@ function docReturn(returns) {
 function docAccessLevel(access) {
 	// Everything is public by default and @public tags
 	// generate warnings, therefore leave them out.
-	if (!access || access === "public") {
-		return "";
+	if (!access || access === 'public') {
+		return '';
 	}
-	return docLine("@" + access);
+	return docLine('@' + access);
 }
 
 function processMember(item) {
@@ -247,10 +247,10 @@ function processMember(item) {
 
 	doc += docLine('@property ' + generateType(item.type) + item.name);
 	doc += docAccessLevel(item.access);
-	if (item.kind === "constant") {
+	if (item.kind === 'constant') {
 		doc += docLine('@readonly');
 	}
-	doc += docLine(item.description ? item.description : "");
+	doc += docLine(item.description ? item.description : '');
 
 	return docEnd(doc);
 }
@@ -260,7 +260,7 @@ function processMethod(item) {
 
 	doc += docLine('@method ' + item.name);
 	doc += docAccessLevel(item.access);
-	doc += docLine(item.description ? item.description : "");
+	doc += docLine(item.description ? item.description : '');
 	doc += docParams(item.params);
 	doc += docReturn(item.returns);
 
@@ -279,7 +279,7 @@ function processClass(item) {
 	doc += docAccessLevel(item.access);
 	doc += docLine(item.description);
 	if (item.meta) {
-		doc += docLine("@constructor");
+		doc += docLine('@constructor');
 		doc += docParams(item.params);
 	}
 
