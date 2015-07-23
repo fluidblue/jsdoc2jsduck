@@ -170,7 +170,7 @@ function processFile(inFile, outDir) {
 				isAllowedPackage(data[i].longname) &&
 				missingParents.indexOf(data[i].memberof) === -1) {
 
-				console.log("Warning: Ignoring JSDoc for " + data[i].longname);
+				console.log("Warning: Ignoring " + data[i].longname);
 			}
 		}
 	}
