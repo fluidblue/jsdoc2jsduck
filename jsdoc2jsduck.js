@@ -338,7 +338,14 @@ function docParams(params) {
 	var doc = '';
 	for (var i = 0; i < params.length; i++) {
 		var type = generateType(params[i].type);
-		var name = params[i].name ? ' ' + params[i].name : '';
+		var name = '';
+		if (params[i].name) {
+			if (params[i].optional) {
+				name = " [" + params[i].name + "]";
+			} else {
+				name = " " + params[i].name;
+			}
+		}
 		var description = params[i].description ? ' ' + params[i].description : '';
 		doc += docLine('@param ' + type + name + description);
 	}
