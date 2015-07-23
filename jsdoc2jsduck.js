@@ -279,6 +279,7 @@ function processClass(item) {
 	doc += docAccessLevel(item.access);
 	doc += docLine(item.description);
 	if (item.meta) {
+		// TODO: Check for static classes
 		doc += docLine('@constructor');
 		doc += docParams(item.params);
 	}
