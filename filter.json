@@ -3,7 +3,7 @@
 		"instance",
 		"static"
 	],
-	"allowedPackages": "^ts\\..+",
+	"allowedPackages": "^ts\\..+|conqat\\..+",
 	"allowedChildren": {
 		"root": [
 			"package"
