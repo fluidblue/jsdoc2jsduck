@@ -215,13 +215,10 @@ function removeInheritedDocs(namedData) {
 		var filterInheritedDocs = function(jsdoc) {
 			// Remove docs for inherited but not overriden members for which an
 			// JSDoc exist. JSDuck will add inherited methods to classes automatically with
-			// inheritance information.
+			// additional inheritance information.
 			var removeDoc = jsdoc.inherits !== undefined &&
 				jsdoc.overrides === undefined &&
 				namedData.hasOwnProperty(jsdoc.inherits);
-			if (removeDoc) {
-				console.log("Filtered: " + jsdoc.longname);
-			}
 			return !removeDoc;
 		}
 		var jsdocs = namedData[longname].filter(filterInheritedDocs);
