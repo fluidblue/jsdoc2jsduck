@@ -95,23 +95,17 @@ function readJSONFile(inFile) {
 	return JSON.parse(data);
 }
 
-function processFile(inFile, outDir) {
-	data = readJSONFile(inFile);
-
-	var fileContent = '';
-	var processedJSDocs = [];
-
+function getMissingParents(data) {
 	var missingParents = [];
-	loop1:
+	outerLoop:
 	for (var i = 0; i < data.length; i++) {
 		if (!data[i].memberof || data[i].kind === 'class') {
-			continue loop1;
+			continue outerLoop;
 		}
 
-		loop2:
 		for (var j = 0; j < data.length; j++) {
 			if (data[i].memberof === data[j].longname) {
-				continue loop1;
+				continue outerLoop;
 			}
 		}
 
@@ -125,6 +119,10 @@ function processFile(inFile, outDir) {
 			//console.error('Warning: Missing parent ' + data[i].memberof + ' for ' + data[i].longname);
 		}
 	}
+	return missingParents;
+}
+
+function addMissingStaticClassDefinitions(data, missingParents) {
 	for (var i = 0; i < missingParents.length; i++) {
 		path = getPath(missingParents[i]);
 		name = path.pop();
@@ -143,6 +141,16 @@ function processFile(inFile, outDir) {
 		data.push(classData);
 		console.error('Warning: Missing static class definition for ' + classData.longname);
 	}
+}
+
+function processFile(inFile, outDir) {
+	data = readJSONFile(inFile);
+
+	var fileContent = '';
+	var processedJSDocs = [];
+
+	var missingParents = getMissingParents(data);
+	addMissingStaticClassDefinitions(data, missingParents);
 
 	var filterByClass = function(jsdoc) {
 		return jsdoc.kind === 'class';
