@@ -187,19 +187,30 @@ function createNamedData(data) {
 	return namedData;
 }
 
-function removeInheritdocs(namedData) {
-	var filterByInheritDoc = function(jsdoc) {
-		return jsdoc.inheritdoc === undefined;
-	};
+function removeDuplicates(namedData) {
+	var filterFunctions = [
+		function(jsdoc) {
+			return jsdoc.inheritdoc === undefined;
+		},
+		// function(jsdoc) {
+		// 	if (jsdoc.ignore === true) {
+		// 		console.log(jsdoc);
+		// 	}
+		// 	return jsdoc.ignore === true;
+		// }
+	];
 
 	for (var longname in namedData) {
 		if (!namedData.hasOwnProperty(longname)) {
 			continue;
 		}
-		var jsdocs = namedData[longname].filter(filterByInheritDoc);
 
-		if (jsdocs.length > 0) {
-			namedData[longname] = jsdocs;
+		for (var i = 0; i < filterFunctions.length; i++) {
+			var jsdocs = namedData[longname].filter(filterFunctions[i]);
+
+			if (jsdocs.length > 0) {
+				namedData[longname] = jsdocs;
+			}
 		}
 	}
 }
@@ -226,7 +237,7 @@ function processFile(inFile, outDir) {
 
 	var namedData = createNamedData(data);
 	testForItemsWithMultipleEntries(namedData);
-	removeInheritdocs(namedData);
+	removeDuplicates(namedData);
 	testForItemsWithMultipleEntries(namedData);
 
 	var fileContent = '';
