@@ -338,6 +338,9 @@ function processMember(item) {
 	if (item.kind === 'constant') {
 		doc += docLine('@readonly');
 	}
+	if (item.scope === "static") {
+		doc += docLine("@static");
+	}
 	doc += docLine(item.description ? item.description : '');
 
 	return docEnd(doc);
@@ -348,6 +351,9 @@ function processMethod(item) {
 
 	doc += docLine('@method ' + item.name);
 	doc += docAccessLevel(item.access);
+	if (item.scope === "static") {
+		doc += docLine("@static");
+	}
 	doc += docLine(item.description ? item.description : '');
 	doc += docParams(item.params);
 	doc += docReturn(item.returns);
