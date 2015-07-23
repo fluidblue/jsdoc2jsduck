@@ -83,8 +83,10 @@ function isAllowedPackage(scope) {
 	if (filter === null || !filter.allowedPackages) {
 		return true;
 	}
-	// TODO
-	return true;
+	if (!(filter.allowedPackages instanceof RegExp)) {
+		filter.allowedPackages = new RegExp(filter.allowedPackages);
+	}
+	return filter.allowedPackages.test(scope);
 }
 
 function readJSONFile(inFile) {
@@ -114,7 +116,7 @@ function processFile(inFile, outDir) {
 
 		if (data[i].longname.indexOf("~") === -1 &&
 			data[i].longname.split("#").length < 2 &&
-			data[i].longname.indexOf("ts.") === 0) {
+			isAllowedPackage(data[i].longname)) {
 
 			if (missingParents.indexOf(data[i].memberof) === -1) {
 				missingParents.push(data[i].memberof);
@@ -165,7 +167,7 @@ function processFile(inFile, outDir) {
 		if (processedJSDocs.indexOf(data[i].longname) === -1) {
 			if (data[i].longname.indexOf("~") === -1 &&
 				data[i].longname.split("#").length < 2 &&
-				data[i].longname.indexOf("ts.") === 0 &&
+				isAllowedPackage(data[i].longname) &&
 				missingParents.indexOf(data[i].memberof) === -1) {
 
 				console.log("Warning: Ignoring JSDoc for " + data[i].longname);
