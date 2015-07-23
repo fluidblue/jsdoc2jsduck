@@ -146,7 +146,7 @@ function addMissingStaticClasses(data, missingStaticClasses) {
 function getClasses(data) {
 	var filterByClass = function(jsdoc) {
 		return jsdoc.kind === 'class';
-	}
+	};
 	return data.filter(filterByClass);
 }
 
