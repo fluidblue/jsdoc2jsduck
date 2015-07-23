@@ -22,12 +22,14 @@ var jsonQuery = require('json-query');
 
 var filter = null;
 
+// Split on symbols: . # ~ :
+var regexPath = new RegExp('[.#~:]', 'g');
+
 // TODO: Remove
 debugger;
 
 function getPath(longname) {
-	// Split on symbols: . # ~
-	return longname.split(new RegExp('[.#~]', 'g'));
+	return longname.split(regexPath);
 }
 
 function processJSDoc(jsdoc) {
