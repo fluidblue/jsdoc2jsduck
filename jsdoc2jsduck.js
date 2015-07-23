@@ -263,6 +263,13 @@ function convertNamedDataToData(namedData) {
 	return data;
 }
 
+function getClassMembers(namedData, className) {
+	var filterByMember = function(jsdoc) {
+		return jsdoc.memberof === className;
+	};
+	return data.filter(filterByMember);
+}
+
 function processFile(inFile, outDir) {
 	data = readJSONFile(inFile);
 
@@ -281,13 +288,9 @@ function processFile(inFile, outDir) {
 
 	var classes = getClasses(data);
 	for (var i = 0; i < classes.length; i++) {
-		fileContent += processJSDoc(classes[i]);
 		processedJSDocs.push(classes[i].longname);
-
-		var filterByMember = function(jsdoc) {
-			return jsdoc.memberof === classes[i].longname;
-		}
-		members = data.filter(filterByMember);
+		fileContent += processJSDoc(classes[i]);
+		var members = getClassMembers(namedData, classes[i].longname);
 		for (var j = 0; j < members.length; j++) {
 			fileContent += processJSDoc(members[j]);
 			processedJSDocs.push(members[j].longname);
