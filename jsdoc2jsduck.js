@@ -46,7 +46,6 @@ function processJSDoc(jsdoc) {
 		console.error('Warning: Missing or invalid JSDoc for ' + jsdoc.longname);
 	}
 
-	// TODO: Handle constant, param
 	switch (jsdoc.kind) {
 		case 'class':
 			return processClass(jsdoc);
