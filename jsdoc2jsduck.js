@@ -143,6 +143,13 @@ function addMissingStaticClasses(data, missingStaticClasses) {
 	}
 }
 
+function getClasses(data) {
+	var filterByClass = function(jsdoc) {
+		return jsdoc.kind === 'class';
+	}
+	return data.filter(filterByClass);
+}
+
 function processFile(inFile, outDir) {
 	data = readJSONFile(inFile);
 
@@ -152,11 +159,7 @@ function processFile(inFile, outDir) {
 	var missingStaticClasses = getMissingStaticClasses(data);
 	addMissingStaticClasses(data, missingStaticClasses);
 
-	var filterByClass = function(jsdoc) {
-		return jsdoc.kind === 'class';
-	}
-	classes = data.filter(filterByClass);
-
+	var classes = getClasses(data);
 	for (var i = 0; i < classes.length; i++) {
 		fileContent += processJSDoc(classes[i]);
 		processedJSDocs.push(classes[i].longname);
