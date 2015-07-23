@@ -43,7 +43,7 @@ function processJSDoc(jsdoc) {
 	// TODO: Add (member): virtual
 
 	if (jsdoc.undocumented) {
-		console.error('Warning: Missing JSDoc for ' + jsdoc.longname);
+		console.error('Warning: Missing or invalid JSDoc for ' + jsdoc.longname);
 	}
 
 	// TODO: Handle constant, param
