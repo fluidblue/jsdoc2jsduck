@@ -234,8 +234,10 @@ function removeDuplicates(namedData) {
 	testForItemsWithMultipleEntries(namedData);
 	removeInheritdocItems(namedData);
 	testForItemsWithMultipleEntries(namedData);
+
+	console.log("JSDocs before removeInheritedDocs: " + Object.keys(namedData).length);
 	removeInheritedDocs(namedData);
-	testForItemsWithMultipleEntries(namedData);
+	console.log("JSDocs after removeInheritedDocs: " + Object.keys(namedData).length);
 }
 
 function testForItemsWithMultipleEntries(namedData) {
