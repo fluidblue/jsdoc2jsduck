@@ -60,7 +60,7 @@ function processJSDoc(jsdoc) {
 			// Ignore, because JSDuck builds package list automatically.
 			return '';
 		default:
-			console.error('Unsupported documentation type (' + jsdoc.kind + ') in file '
+			console.error('Warning: Unsupported documentation type (' + jsdoc.kind + ') in file '
 				+ jsdoc.meta.path + '/' + jsdoc.meta.filename + ':' + jsdoc.meta.lineno);
 			return '';
 	}
@@ -122,7 +122,7 @@ function processFile(inFile, outDir) {
 			if (missingParents.indexOf(data[i].memberof) === -1) {
 				missingParents.push(data[i].memberof);
 			}
-			//console.error('Missing parent ' + data[i].memberof + ' for ' + data[i].longname);
+			//console.error('Warning: Missing parent ' + data[i].memberof + ' for ' + data[i].longname);
 		}
 	}
 	for (var i = 0; i < missingParents.length; i++) {
