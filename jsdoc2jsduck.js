@@ -135,13 +135,13 @@ function processFile(inFile, outDir) {
 			name: name,
 			longname: missingParents[i],
 			scope: 'static',
-			undocumented: true
+			undocumentedStaticClass: true
 		};
 		if (path.length > 1) {
 			classData.memberof = path.join('.');
 		}
 		data.push(classData);
-		console.error('Warning: Missing class definition for ' + classData.longname);
+		console.error('Warning: Missing static class definition for ' + classData.longname);
 	}
 
 	var filterByClass = function(jsdoc) {
@@ -269,10 +269,11 @@ function processMethod(item) {
 }
 
 function isStaticClass(jsdoc) {
-	return jsdoc.kind === "class" &&
+	return jsdoc.undocumentedStaticClass ||
+		(jsdoc.kind === "class" &&
 		jsdoc.meta &&
 		jsdoc.meta.code &&
-		jsdoc.meta.code.type === "MemberExpression";
+		jsdoc.meta.code.type === "MemberExpression");
 }
 
 function processClass(item) {
@@ -286,11 +287,12 @@ function processClass(item) {
 	}
 	doc += docAccessLevel(item.access);
 	doc += docLine(item.description);
-	if (!isStaticClass(item)) {
+	if (isStaticClass(item)) {
+		doc += docLine('@static');
+		console.log("Info: Static class found: " + item.longname);
+	} else {
 		doc += docLine('@constructor');
 		doc += docParams(item.params);
-	} else {
-		console.log("Info: Static class found: " + item.longname);
 	}
 
 	return docEnd(doc);
