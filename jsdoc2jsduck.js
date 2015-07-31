@@ -287,28 +287,10 @@ function processFile(inFile, outDir) {
 	addMissingStaticClasses(data, missingStaticClasses);
 
 	var classes = getClasses(data);
-	outerLoop:
 	for (var i = 0; i < classes.length; i++) {
 		processedJSDocs.push(classes[i].longname);
-		var members = getClassMembers(namedData, classes[i].longname);
-		if (classes[i].undocumentedStaticClass) {
-			// TODO: Test
-			if (classes[i].longname === "conqat.base") {
-				console.log(members);
-			}
-			
-			var onlyClassChildren = true;
-			for (var j = 0; j < members.length; j++) {
-				if (members[j].kind !== "class") {
-					onlyClassChildren = false;
-					break;
-				}
-			}
-			if (onlyClassChildren) {
-				continue outerLoop;
-			}
-		}
 		fileContent += processJSDoc(classes[i]);
+		var members = getClassMembers(namedData, classes[i].longname);
 		for (var j = 0; j < members.length; j++) {
 			fileContent += processJSDoc(members[j]);
 			processedJSDocs.push(members[j].longname);
