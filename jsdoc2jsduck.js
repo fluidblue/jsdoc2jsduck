@@ -289,8 +289,27 @@ function processFile(inFile, outDir) {
 	var classes = getClasses(data);
 	for (var i = 0; i < classes.length; i++) {
 		processedJSDocs.push(classes[i].longname);
-		fileContent += processJSDoc(classes[i]);
 		var members = getClassMembers(namedData, classes[i].longname);
+		var isPackage = false;
+		if (classes[i].undocumentedStaticClass) {
+			// TODO: Test
+			// if (classes[i].longname === "conqat.base") {
+			// 	console.log(members);
+			// }
+			
+			isPackage = true;
+			for (var j = 0; j < members.length; j++) {
+				if (members[j].kind !== "class") {
+					isPackage = false;
+					break;
+				}
+			}
+		}
+		if (!isPackage) {
+			fileContent += processJSDoc(classes[i]);
+		} else {
+			console.log("Filtered package: " + classes[i].longname);
+		}
 		for (var j = 0; j < members.length; j++) {
 			fileContent += processJSDoc(members[j]);
 			processedJSDocs.push(members[j].longname);
