@@ -32,7 +32,6 @@ function getPath(longname) {
 function processJSDoc(jsdoc) {
 	// TODO: Add defaultvalue (and defaultvaluetype)
 	// TODO: Add exceptions
-	// TODO: Add (member): optional
 	// TODO: Add (member): virtual
 
 	if (jsdoc.undocumented) {
