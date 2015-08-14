@@ -189,7 +189,7 @@ function removeInheritdocItems(namedData) {
 		}
 
 		var filterByInheritdoc = function(jsdoc) {
-			// Remove "inheritdoc" items, which contain no valuable information.
+			// Remove 'inheritdoc' items, which contain no valuable information.
 			return jsdoc.inheritdoc === undefined;
 		};
 		var jsdocs = namedData[longname].filter(filterByInheritdoc);
@@ -230,9 +230,9 @@ function removeDuplicates(namedData) {
 	removeInheritdocItems(namedData);
 	testForItemsWithMultipleEntries(namedData);
 
-	console.log("JSDocs before removeInheritedDocs: " + Object.keys(namedData).length);
+	console.log('JSDocs before removeInheritedDocs: ' + Object.keys(namedData).length);
 	removeInheritedDocs(namedData);
-	console.log("JSDocs after removeInheritedDocs: " + Object.keys(namedData).length);
+	console.log('JSDocs after removeInheritedDocs: ' + Object.keys(namedData).length);
 }
 
 function testForItemsWithMultipleEntries(namedData) {
@@ -241,13 +241,13 @@ function testForItemsWithMultipleEntries(namedData) {
 		if (namedData.hasOwnProperty(longname)) {
 			if (namedData[longname].length > 1) {
 				var test = namedData[longname];
-				//console.log("Multiple entries for " + longname + ": " + namedData[longname].length);
+				//console.log('Multiple entries for ' + longname + ': ' + namedData[longname].length);
 				//console.log(namedData[longname]);
 				itemsWithMultipleEntries++;
 			}
 		}
 	}
-	console.log("itemsWithMultipleEntries: " + itemsWithMultipleEntries);
+	console.log('itemsWithMultipleEntries: ' + itemsWithMultipleEntries);
 }
 
 function convertNamedDataToData(namedData) {
@@ -341,9 +341,9 @@ function docParams(params) {
 		var name = '';
 		if (params[i].name) {
 			if (params[i].optional) {
-				name = " [" + params[i].name + "]";
+				name = ' [' + params[i].name + ']';
 			} else {
-				name = " " + params[i].name;
+				name = ' ' + params[i].name;
 			}
 		}
 		var description = params[i].description ? ' ' + params[i].description : '';
@@ -393,8 +393,8 @@ function processMember(item) {
 	if (item.kind === 'constant') {
 		doc += docLine('@readonly');
 	}
-	if (item.scope === "static") {
-		doc += docLine("@static");
+	if (item.scope === 'static') {
+		doc += docLine('@static');
 	}
 	doc += docLine(item.description ? item.description : '');
 
@@ -409,8 +409,8 @@ function processMethod(item) {
 	if (item.deprecated === true) {
 		doc += docLine('@deprecated');
 	}
-	if (item.scope === "static") {
-		doc += docLine("@static");
+	if (item.scope === 'static') {
+		doc += docLine('@static');
 	}
 	doc += docLine(item.description ? item.description : '');
 	doc += docParams(item.params);
@@ -421,10 +421,10 @@ function processMethod(item) {
 
 function isStaticClass(jsdoc) {
 	return jsdoc.undocumentedStaticClass ||
-		(jsdoc.kind === "class" &&
+		(jsdoc.kind === 'class' &&
 		jsdoc.meta &&
 		jsdoc.meta.code &&
-		jsdoc.meta.code.type === "MemberExpression");
+		jsdoc.meta.code.type === 'MemberExpression');
 }
 
 function processClass(item) {
@@ -443,7 +443,7 @@ function processClass(item) {
 	doc += docLine(item.description);
 	if (isStaticClass(item)) {
 		doc += docLine('@static');
-		//console.log("Info: Static class found: " + item.longname);
+		//console.log('Info: Static class found: ' + item.longname);
 	} else {
 		doc += docLine('@constructor');
 		doc += docParams(item.params);
