@@ -3,6 +3,8 @@ This program takes the output of [JSDoc v3](https://github.com/jsdoc3/jsdoc) and
 This allows to create beautiful JSDuck documentations from Javascript projects using JSDoc syntax.
 Google Closure can be used in the input Javascript projects.
 
+Please note that jsdoc2jsduck is not yet stable.
+
 
 ## Install
 
