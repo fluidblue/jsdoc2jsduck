@@ -21,6 +21,7 @@ var optimist = require('optimist');
 var jsonQuery = require('json-query');
 
 var filter = null;
+var debug = false;
 
 // Split on symbols: . # ~ :
 var regexPath = new RegExp('[.#~:]', 'g');
@@ -157,8 +158,9 @@ function testForInheritdocsWithMissingInherited(data) {
 			inheritdocsWithMissingInherited.push(inheritdocs[i]);
 		}
 	}
-	console.log(inheritdocs.length);
-	console.log(inherited.length);
+	console.log('Inheritdocs: ' + inheritdocs.length);
+	console.log('Inherited: ' + inherited.length);
+	console.log('Inheritdocs with missing inherited:');
 	console.log(inheritdocsWithMissingInherited);
 }
 
@@ -221,13 +223,22 @@ function removeInheritedDocs(namedData) {
 }
 
 function removeDuplicates(namedData) {
-	testForItemsWithMultipleEntries(namedData);
+	if (debug) {
+		testForItemsWithMultipleEntries(namedData);
+		console.log('Removing inherited doc items');
+	}
 	removeInheritdocItems(namedData);
-	testForItemsWithMultipleEntries(namedData);
+	if (debug) {
+		testForItemsWithMultipleEntries(namedData);
+	}
 
-	console.log('JSDocs before removeInheritedDocs: ' + Object.keys(namedData).length);
+	if (debug) {
+		console.log('JSDocs before removeInheritedDocs: ' + Object.keys(namedData).length);
+	}
 	removeInheritedDocs(namedData);
-	console.log('JSDocs after removeInheritedDocs: ' + Object.keys(namedData).length);
+	if (debug) {
+		console.log('JSDocs after removeInheritedDocs: ' + Object.keys(namedData).length);
+	}
 }
 
 function testForItemsWithMultipleEntries(namedData) {
@@ -268,8 +279,9 @@ function getClassMembers(namedData, className) {
 function processFile(inFile, outDir) {
 	data = readJSONFile(inFile);
 
-	// TODO: Remove
-	//testForInheritdocsWithMissingInherited(data);
+	if (debug) {
+		testForInheritdocsWithMissingInherited(data);
+	}
 
 	var namedData = createNamedData(data);
 	removeDuplicates(namedData);
@@ -482,6 +494,10 @@ function getArgv() {
 		.alias('f', 'filter')
 		.describe('f', 'JSON file containing filter settings')
 
+		.boolean('d')
+		.alias('d', 'debug')
+		.describe('d', 'Enable debugging')
+
 		.argv;
 }
 
@@ -491,6 +507,8 @@ function main() {
 	var inFile = path.resolve(argv.in);
 	var outDir = path.resolve(argv.out);
 	var filterFile = path.resolve(argv.filter);
+
+	debug = argv.debug;
 
 	console.log('Input file: ' + inFile);
 	console.log('Output dir: ' + outDir);
