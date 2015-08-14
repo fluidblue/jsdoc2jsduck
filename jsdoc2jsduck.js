@@ -18,7 +18,6 @@
 var fs = require('fs');
 var path = require('path');
 var optimist = require('optimist');
-var jsonQuery = require('json-query');
 
 var filter = null;
 var debug = false;
