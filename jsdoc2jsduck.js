@@ -25,16 +25,11 @@ var filter = null;
 // Split on symbols: . # ~ :
 var regexPath = new RegExp('[.#~:]', 'g');
 
-// TODO: Remove
-debugger;
-
 function getPath(longname) {
 	return longname.split(regexPath);
 }
 
 function processJSDoc(jsdoc) {
-	// TODO: Add author
-	// TODO: Add copyright
 	// TODO: Add defaultvalue (and defaultvaluetype)
 	// TODO: Add exceptions
 	// TODO: Add (member): optional
