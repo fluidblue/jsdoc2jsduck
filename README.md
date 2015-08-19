@@ -27,4 +27,14 @@ You also need to install jsdoc and jsduck:
     jsdoc2jsduck --in "./jsdoc.json" --out "./jsdoc2jsduck-out/" --filter "./filter.json"
     
     # Generate documentation with JSDuck
-    jsduck "./jsdoc2jsduck-out/out.js" --builtin-classes --output "jsduck/"
+    jsduck "./jsdoc2jsduck-out/" --builtin-classes --output "jsduck/"
+
+In the working directory of the script, a temporary file `jsdoc.json` and a temporary directory `jsdoc2jsduck-out` will be created, as well as the directory `jsduck`, which contains the resulting JSDuck documentation.
+
+
+## License
+
+Copyright (C) 2015 Max Geissler
+
+This program is free software, licensed under the GNU General Public License (GPL).
+Please see the [License](LICENSE) for further information.
